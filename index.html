@@ -2032,24 +2032,6 @@ body {
     color: var(--accent-light);
 }
 
-.theme-debug-button {
-    margin-top: 16px;
-    padding: 10px 14px;
-    border: 1px solid var(--border-accent);
-    border-radius: 10px;
-    color: var(--text);
-    background: color-mix(in srgb, var(--panel) 80%, transparent);
-    cursor: pointer;
-    font: inherit;
-    font-weight: 700;
-    transition: background .4s ease, border-color .4s ease, color .3s ease;
-}
-
-.theme-debug-button:hover {
-    border-color: var(--accent-light);
-    background: color-mix(in srgb, var(--accent) 14%, transparent);
-}
-
 body.theme-halloween .home-hero,
 body.theme-christmas .home-hero {
     background-image:
@@ -2793,12 +2775,6 @@ body.theme-christmas .santa-flyby.is-flying .santa-arm {
                rel="noopener noreferrer">
                 f&nbsp; Find Barrow County Cruisers on Facebook ↗
             </a>
-
-            <br>
-
-            <button id="themeDebugButton" class="theme-debug-button" type="button" onclick="cycleTheme()">
-                🎨 Theme: Automatic
-            </button>
 
         </div>
 
@@ -4803,12 +4779,6 @@ const seasonalClasses = [
     "theme-halloween", "theme-thanksgiving", "theme-christmas"
 ];
 
-const debugThemeOptions = [
-    "winter", "valentine", "spring", "showers", "late-spring", "summer",
-    "independence", "fall", "halloween", "thanksgiving", "christmas", "default", "auto"
-];
-let debugThemeIndex = -1;
-
 function setTheme(theme) {
     document.body.classList.remove(...seasonalClasses);
     if (theme !== "default") {
@@ -4927,23 +4897,6 @@ document.addEventListener("click", event => {
 
 function applySeasonalTheme() {
     setTheme(getSeasonalTheme());
-    document.getElementById("themeDebugButton").textContent = "🎨 Theme: Automatic";
-}
-
-function cycleTheme() {
-    debugThemeIndex = (debugThemeIndex + 1) % debugThemeOptions.length;
-    const theme = debugThemeOptions[debugThemeIndex];
-    if (theme === "auto") {
-        debugThemeIndex = -1;
-        applySeasonalTheme();
-        return;
-    }
-
-    setTheme(theme);
-    const label = theme === "default"
-        ? "Default (Georgia Red)"
-        : theme.split("-").map(word => word[0].toUpperCase() + word.slice(1)).join(" ");
-    document.getElementById("themeDebugButton").textContent = `🎨 Preview Theme: ${label}`;
 }
 
 applySeasonalTheme();
@@ -4959,7 +4912,7 @@ if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
 }
 
 setInterval(() => {
-    if (debugThemeIndex === -1 && getSeasonalTheme() !== currentTheme) {
+    if (getSeasonalTheme() !== currentTheme) {
         applySeasonalTheme();
     }
 }, 60 * 1000);
