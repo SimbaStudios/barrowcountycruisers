@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 
 <title>Barrow County Cruisers</title>
 
@@ -109,6 +110,7 @@ header {
 .brand {
     display: flex;
     align-items: center;
+    gap: 10px;
 
     padding: 0;
     border: 0;
@@ -120,6 +122,13 @@ header {
     font-weight: 900;
     font-family: inherit;
     text-align: left;
+}
+
+.brand-icon {
+    display: block;
+    width: 36px;
+    height: 36px;
+    flex: 0 0 auto;
 }
 
 .brand:focus-visible,
@@ -1313,6 +1322,64 @@ footer b {
     body:not(.weather-unknown) .weather-indicator .weather-summary-short { display: inline; }
 }
 
+@media (max-width: 680px) {
+    .nav {
+        width: calc(100% - 24px);
+        min-height: 0;
+        padding: 6px 0 5px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas: "brand weather" "links links";
+        gap: 3px 8px;
+        align-items: center;
+    }
+
+    .brand {
+        grid-area: brand;
+        gap: 7px;
+        min-width: 0;
+        font-size: clamp(.82rem, 3.7vw, .98rem);
+        white-space: nowrap;
+    }
+
+    .brand-icon {
+        width: 30px;
+        height: 30px;
+    }
+
+    .weather-indicator {
+        grid-area: weather;
+        gap: 5px;
+        padding: 4px 8px;
+        font-size: .68rem;
+    }
+
+    .weather-indicator strong { font-size: .74rem; }
+
+    nav {
+        grid-area: links;
+        width: 100%;
+        justify-content: flex-end;
+        gap: 4px;
+    }
+
+    nav button {
+        min-height: 36px;
+        padding: 6px 11px;
+        font-size: .82rem;
+    }
+
+    .page { min-height: calc(100vh - 84px); }
+    .home-hero { padding: 42px 14px; }
+    .home-content h1 {
+        font-size: clamp(2.2rem, 10vw, 3rem);
+        letter-spacing: -2px;
+    }
+    .home-description { font-size: .98rem; line-height: 1.65; }
+    .event-detail { padding-top: 30px; }
+    .inner-head { padding-top: 24px; }
+}
+
 @media(max-width:500px) {
 
     .container {
@@ -1326,7 +1393,7 @@ footer b {
     }
 
     .home-content h1 {
-        font-size: 3rem;
+        font-size: clamp(2.15rem, 10.5vw, 2.65rem);
 
         letter-spacing: -2px;
     }
@@ -1343,6 +1410,12 @@ footer b {
     .event-preview {
         padding: 15px;
     }
+
+    .brand { font-size: .82rem; }
+    .brand-icon { width: 27px; height: 27px; }
+    .weather-indicator { padding: 3px 7px; font-size: .64rem; }
+    .weather-indicator strong { font-size: .7rem; }
+    nav button { padding-inline: 9px; font-size: .78rem; }
 }
 
 
@@ -3505,6 +3578,7 @@ body.theme-christmas .santa-flyby.is-flying .santa-arm {
     <button class="brand" type="button"
             onclick="openPage('home')">
 
+        <img class="brand-icon" src="favicon.svg" alt="" aria-hidden="true" width="36" height="36">
         Barrow County Cruisers
 
     </button>
@@ -3975,7 +4049,6 @@ body.theme-christmas .santa-flyby.is-flying .santa-arm {
         <figcaption id="lightboxCaption"></figcaption>
     </figure>
     <div class="photo-lightbox-actions">
-        <button id="lightboxEventDetails" class="photo-lightbox-download" type="button" hidden onclick="openEventDetailsFromLightbox()">View event details</button>
         <a id="lightboxDownload" class="photo-lightbox-download" href="" download onclick="downloadPhoto(event)">Download image</a>
         <span id="lightboxDownloadStatus" class="photo-lightbox-download-status" role="status" aria-live="polite"></span>
     </div>
@@ -4345,26 +4418,18 @@ function renderConfiguredPhotos() {
     });
 }
 
-function openPhoto(src, filename, downloadFilename = filename, showEventDetails = false) {
+function openPhoto(src, filename, downloadFilename = filename) {
     document.getElementById("lightboxImage").src = src;
     document.getElementById("lightboxImage").alt = filename;
     document.getElementById("lightboxCaption").textContent = filename;
     const download = document.getElementById("lightboxDownload");
     download.href = src;
     download.download = downloadFilename;
-    document.getElementById("lightboxEventDetails").hidden = !showEventDetails;
     document.getElementById("lightboxDownloadStatus").textContent = "";
     const lightbox = document.getElementById("photoLightbox");
     lightbox.classList.remove("is-closing", "is-opening");
     lightbox.showModal();
     lightbox.classList.add("is-opening");
-}
-
-let navigateToEventAfterPhotoClose = false;
-
-function openEventDetailsFromLightbox() {
-    navigateToEventAfterPhotoClose = true;
-    closePhoto();
 }
 
 function closePhoto() {
@@ -4391,10 +4456,6 @@ document.getElementById("photoLightbox").addEventListener("animationend", event 
 
 document.getElementById("photoLightbox").addEventListener("close", event => {
     event.currentTarget.classList.remove("is-opening", "is-closing");
-    if (navigateToEventAfterPhotoClose) {
-        navigateToEventAfterPhotoClose = false;
-        openPage("event-detail");
-    }
 });
 
 document.getElementById("photoLightbox").addEventListener("cancel", event => {
@@ -4443,7 +4504,7 @@ async function downloadPhoto(event) {
 
 document.addEventListener("click", event => {
     const image = event.target instanceof Element ? event.target.closest("img") : null;
-    if (!image || image.closest("#photoLightbox")) return;
+    if (!image || image.closest("#photoLightbox, .brand, [aria-hidden='true']")) return;
 
     const source = image.currentSrc || image.getAttribute("src");
     if (!source) return;
@@ -4466,7 +4527,7 @@ document.addEventListener("click", event => {
         try { sessionStorage.setItem("barrowCountyCruisersSelectedShow", currentShow.id); } catch {}
         renderEventDetail(currentShow);
     }
-    openPhoto(source, image.alt || filename, filename, Boolean(eventCardWithDetails));
+    openPhoto(source, image.alt || filename, filename);
 }, true);
 
 
