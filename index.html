@@ -687,6 +687,33 @@ nav button.active {
     position: relative;
 }
 
+.event-flyer-pair {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    align-items: center;
+}
+
+.event-flyer-pair.has-supplementary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.event-flyer-pair .flyer {
+    height: 100%;
+    max-height: 580px;
+    object-fit: contain;
+    cursor: zoom-in;
+}
+
+#eventSupplementaryImage[hidden] { display: none; }
+
+@media (max-width: 600px) {
+    .event-flyer-pair,
+    .event-flyer-pair.has-supplementary { grid-template-columns: 1fr; }
+    .event-flyer-pair .flyer { max-height: 520px; }
+}
+
 .flyer-glow {
     position: absolute;
 
@@ -1076,6 +1103,18 @@ img:not(#lightboxImage) {
     aspect-ratio: 4 / 3;
     object-fit: cover;
     cursor: zoom-in;
+    opacity: 0;
+    transform: translateY(14px) scale(.985);
+    transition: opacity .55s ease, transform .55s cubic-bezier(.2,.75,.25,1);
+}
+
+.photo-item.is-visible img {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .photo-item img { transition: none; transform: none; }
 }
 
 .photo-item img:focus-visible {
@@ -2129,6 +2168,10 @@ body {
 .event-preview:hover {
     border-color: var(--border-accent);
 }
+
+.event-preview.archived-event { cursor: pointer; }
+.event-preview.archived-event:hover { transform: translateY(-4px); border-color: var(--border-accent); }
+.event-preview.archived-event img { cursor: zoom-in; }
 
 .event-preview-tag,
 .arrow,
@@ -3713,7 +3756,7 @@ body.theme-christmas .santa-flyby.is-flying .santa-arm {
         class="back"
         onclick="openPage('events')">
 
-        ← Upcoming Events
+        ← All Events
 
     </button>
 
@@ -3728,15 +3771,27 @@ body.theme-christmas .santa-flyby.is-flying .santa-arm {
             <div class="flyer-glow"></div>
 
 
-            <img
-                id="eventFlyer"
-                class="flyer"
-                src=""
-                alt="Barrow County Cruisers Trunk or Treat flyer"
-                role="button"
-                tabindex="0"
-                aria-label="Open the Trunk or Treat flyer at full size"
-                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
+            <div class="event-flyer-pair">
+                <img
+                    id="eventFlyer"
+                    class="flyer"
+                    src=""
+                    alt="Barrow County Cruisers event flyer"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Open the event flyer at full size"
+                    onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
+                <img
+                    id="eventSupplementaryImage"
+                    class="flyer"
+                    src=""
+                    alt=""
+                    hidden
+                    role="button"
+                    tabindex="0"
+                    aria-label="Open event photo at full size"
+                    onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
+            </div>
 
         </div>
 
@@ -3755,20 +3810,7 @@ body.theme-christmas .santa-flyby.is-flying .santa-arm {
             <h1 id="eventName"></h1>
 
 
-            <div class="event-location">
-
-                <span id="eventDate">October 24, 2026</span>
-
-                <br>
-
-                4:00 PM – 8:00 PM
-
-                <br>
-
-                189 W Athens St,
-                Winder, GA 30680
-
-            </div>
+            <div class="event-location" id="eventLocation"></div>
 
 
 
@@ -3777,7 +3819,7 @@ body.theme-christmas .santa-flyby.is-flying .santa-arm {
             <div id="countdownArea">
 
 
-                <div class="countdown-label">
+                <div class="countdown-label" id="countdownLabel">
                     Show starts in
                 </div>
 
@@ -3853,52 +3895,7 @@ body.theme-christmas .santa-flyby.is-flying .santa-arm {
 
 
 
-            <div class="details">
-
-
-                <div class="detail">
-
-                    📅
-                    <b>
-                        October 24, 2026
-                    </b>
-
-                </div>
-
-
-                <div class="detail">
-
-                    🕓
-                    <b>
-                        4:00 PM – 8:00 PM
-                    </b>
-
-                </div>
-
-
-                <div class="detail">
-
-                    🎃
-                    <b>
-                        Trunk or Treat:
-                        5:00 PM – 7:00 PM
-                    </b>
-
-                </div>
-
-
-                <div class="detail">
-
-                    📍
-                    <b>
-                        189 W Athens St,
-                        Winder, GA 30680
-                    </b>
-
-                </div>
-
-
-            </div>
+            <div class="details" id="eventDetails"></div>
 
 
             <button class="photos-link" onclick="openPhotos()">
@@ -4086,14 +4083,14 @@ body.theme-christmas .santa-flyby.is-flying .santa-arm {
    ========================================================== */
 
 const FLYER_IMAGE = "trunk-or-treat-2026/trunk-or-treat-2026.webp";
-const PHOTO_FOLDER = "trunk-or-treat-2026/Show%20Photos/";
-
-
 /* ==========================================================
    EVENT CONFIGURATION
    ========================================================== */
 
 const upcomingShow = {
+
+    id:
+        "trunk-or-treat-2026",
 
     shortName:
         "Trunk or Treat",
@@ -4119,6 +4116,34 @@ const upcomingShow = {
 
 };
 
+const pastShows = [
+    {
+        id: "veterans-day-2026",
+        shortName: "Honoring Our Veterans",
+        name: "Honoring Our Veterans",
+        subtitle: "Car, Bike & Truck Show",
+        date: "2026-09-26",
+        time: "3:00 PM – 7:00 PM",
+        location: "189 W Athens St, Winder, GA 30680",
+        note: "Veterans recognition and awards · Food from Cassie’s Pit Stop",
+        flyer: "veterans-day-2026/veterans-day-2026.webp",
+        supplementaryPhoto: "veterans-day-2026/veterans-day-hands.webp",
+        photos: []
+    }
+];
+
+// Veterans Day gallery files are listed from Show Photos; banner images lead the album.
+const veteransBannerPhotos = [
+    { src: "veterans-day-2026/Show%20Photos/The%20veterans%20banner/IMG_2152.webp", filename: "IMG_2152.webp" },
+    { src: "veterans-day-2026/Show%20Photos/The%20veterans%20banner/IMG_2153.webp", filename: "IMG_2153.webp" },
+    { src: "veterans-day-2026/Show%20Photos/The%20veterans%20banner/IMG_2154.webp", filename: "IMG_2154.webp" }
+];
+const veteransShowPhotos = [
+    { src: "veterans-day-2026/veterans-day-hands.webp", filename: "Veterans Day hands photo" },
+    ...["IMG_2155.webp","IMG_2156.webp","IMG_2157.webp","IMG_2158.webp","IMG_2159.webp","IMG_2160.webp","IMG_2161.webp","IMG_2162.webp","IMG_2163.webp","IMG_2164.webp","IMG_2165.webp","IMG_2166.webp","IMG_2167.webp","IMG_2168.webp","IMG_2169.webp","IMG_2170.webp","IMG_2171.webp","IMG_2172.webp","IMG_2173.webp","IMG_2174.webp","IMG_2175.webp","IMG_2176.webp","IMG_2177.webp","IMG_2178.webp","IMG_2179.webp","IMG_2180.webp","IMG_2181.webp","IMG_2182.webp","IMG_2183.webp","IMG_2184.webp","IMG_2185.webp","IMG_2186.webp","IMG_2187.webp","IMG_2188.webp","IMG_2189.webp","IMG_2190.webp","IMG_2191.webp","IMG_2192.webp","IMG_2193.webp","IMG_2194.webp","IMG_2195.webp","IMG_2196.webp","IMG_2197.webp","IMG_2198.webp","IMG_2199.webp","IMG_2200.webp","IMG_2201.webp","IMG_2202.webp","IMG_2203.webp","IMG_2204.webp","IMG_2205.webp","IMG_2206.webp","IMG_2207.webp","IMG_2208.webp","IMG_2209.webp","IMG_2210.webp","IMG_2211.webp","IMG_2212.webp","IMG_2213.webp","IMG_2214.webp","IMG_2215.webp","IMG_2216.webp","IMG_2217.webp","IMG_2218.webp","IMG_2219.webp","IMG_2220.webp","IMG_2221.webp","IMG_2222.webp","IMG_2223.webp","IMG_2224.webp","IMG_2225.webp","IMG_2226.webp","IMG_2227.webp","IMG_2228.webp","IMG_2229.webp","IMG_2230.webp","IMG_2231.webp","IMG_2232.webp","IMG_2233.webp","IMG_2234.webp","IMG_2235.webp","IMG_2236.webp","IMG_2237.webp","IMG_2238.webp","IMG_2239.webp","IMG_2240.webp","IMG_2241.webp","IMG_2242.webp","IMG_2243.webp","IMG_2244.webp","IMG_2245.webp","IMG_2246.webp","IMG_2247.webp","IMG_2248.webp","IMG_2249.webp","IMG_2250.webp","IMG_2251.webp","IMG_2252.webp","IMG_2253.webp","IMG_2254.webp","IMG_2255.webp","IMG_2256.webp","IMG_2257.webp","IMG_2258.webp","IMG_2259.webp","IMG_2260.webp","IMG_2261.webp","IMG_2262.webp","IMG_2263.webp","IMG_2264.webp","IMG_2265.webp","IMG_2266.webp","IMG_2267.webp","IMG_2268.webp","IMG_2269.webp","IMG_2270.webp","IMG_2271.webp","IMG_2272.webp","IMG_2273.webp","IMG_2274.webp","IMG_2275.webp","IMG_2276.webp","IMG_2277.webp","IMG_2278.webp","IMG_2279.webp","IMG_2280.webp","IMG_2281.webp","IMG_2282.webp","IMG_2283.webp","IMG_2284.webp","IMG_2285.webp","IMG_2286.webp","IMG_2287.webp","IMG_2288.webp","IMG_2289.webp","IMG_2290.webp","IMG_2291.webp","IMG_2292.webp","IMG_2293.webp","IMG_2294.webp","IMG_2295.webp","IMG_2296.webp","IMG_2297.webp","IMG_2298.webp","IMG_2299.webp","IMG_2300.webp","IMG_2301.webp","IMG_2302.webp","IMG_2303.webp","IMG_2304.webp","IMG_2305.webp","IMG_2306.webp","IMG_2307.webp","IMG_2308.webp","IMG_2309.webp","IMG_2310.webp","IMG_2311.webp","IMG_2312.webp","IMG_2313.webp","IMG_2314.webp","IMG_2315.webp","IMG_2316.webp","IMG_2317.webp","IMG_2318.webp","IMG_2319.webp","IMG_2320.webp","IMG_2321.webp","IMG_2322.webp","IMG_2323.webp","IMG_2324.webp","IMG_2325.webp","IMG_2326.webp","IMG_2327.webp","IMG_2328.webp","IMG_2329.webp","IMG_2330.webp","IMG_2331.webp","IMG_2332.webp","IMG_2333.webp","IMG_2334.webp","IMG_2335.webp","IMG_2336.webp","IMG_2337.webp","IMG_2338.webp","IMG_2339.webp","IMG_2340.webp","IMG_2341.webp","IMG_2342.webp","IMG_2343.webp","IMG_2344.webp","IMG_2345.webp","IMG_2346.webp","IMG_2347.webp","IMG_2348.webp","IMG_2349.webp","IMG_2350.webp","IMG_2351.webp","IMG_2352.webp","IMG_2353.webp","IMG_2354.webp","IMG_2355.webp","IMG_2356.webp","IMG_2357.webp","IMG_2358.webp","IMG_2359.webp","IMG_2360.webp","IMG_2361.webp","IMG_2362.webp","IMG_2363.webp","IMG_2364.webp","IMG_2365.webp","IMG_2366.webp","IMG_2367.webp","IMG_2368.webp","IMG_2369.webp","IMG_2370.webp","IMG_2371.webp","IMG_2372.webp","IMG_2373.webp","IMG_2374.webp","IMG_2375.webp","IMG_2376.webp","IMG_2377.webp","IMG_2378.webp","IMG_2379.webp","IMG_2380.webp","IMG_2381.webp","IMG_2382.webp","IMG_2383.webp","IMG_2384.webp","IMG_2385.webp","IMG_2386.webp","IMG_2387.webp","IMG_2388.webp","IMG_2389.webp","IMG_2390.webp","IMG_2391.webp","IMG_2392.webp","IMG_2393.webp","IMG_2394.webp","IMG_2395.webp","IMG_2396.webp","IMG_2397.webp","IMG_2398.webp","IMG_2399.webp","IMG_2400.webp","IMG_2401.webp","IMG_2402.webp","IMG_2403.webp"].map(filename => ({ src: "veterans-day-2026/Show%20Photos/" + encodeURIComponent(filename), filename }))
+];
+pastShows[0].photos = [...veteransBannerPhotos, ...veteransShowPhotos];
+
 const showStart = new Date(upcomingShow.start).getTime();
 const showEnd = new Date(upcomingShow.end).getTime();
 let renderedAsEnded = Date.now() >= showEnd;
@@ -4133,11 +4158,27 @@ function formatShowDate() {
     });
 }
 
+function renderPastShowCard(show) {
+    const date = new Date(`${show.date}T12:00:00-04:00`).toLocaleDateString("en-US", {
+        month: "long", day: "numeric", year: "numeric", timeZone: "America/New_York"
+    });
+    return `
+        <article class="event-preview past archived-event" data-show-kind="past" data-show-index="${pastShows.indexOf(show)}" onclick="openShow(pastShows[${pastShows.indexOf(show)}])" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openShow(pastShows[${pastShows.indexOf(show)}])}">
+            <img src="${show.flyer}" alt="${show.name} ${show.subtitle} flyer" loading="lazy">
+            <div>
+                <div class="event-preview-tag">🏁 Past show · ${date}</div>
+                <h2>${show.name} — ${show.subtitle}</h2>
+                <p>${show.time}<br>${show.location}<br>${show.note}</p>
+            </div>
+            <div class="arrow" aria-hidden="true">→</div>
+        </article>`;
+}
+
 function renderEventSections() {
     const ended = showHasEnded();
     renderedAsEnded = ended;
     const card = `
-        <div class="event-preview ${ended ? "past" : ""}" onclick="openPage('event-detail')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPage('event-detail')}">
+        <div class="event-preview ${ended ? "past" : ""}" data-show-kind="upcoming" onclick="openShow(upcomingShow)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openShow(upcomingShow)}">
             <img src="${upcomingShow.flyer}" alt="${upcomingShow.shortName} flyer">
             <div>
                 <div class="event-preview-tag">${ended ? "🏁 Ended · " : "📅 "}${formatShowDate()}</div>
@@ -4149,53 +4190,158 @@ function renderEventSections() {
 
     document.getElementById("upcomingEvents").innerHTML = ended
         ? '<p class="event-empty">There are no upcoming shows posted right now.</p>' : card;
-    document.getElementById("pastEvents").innerHTML = ended
-        ? card : '<p class="event-empty">Past shows will appear here after they end.</p>';
+    const pastEventCards = pastShows
+        .slice()
+        .sort((first, second) => new Date(second.date) - new Date(first.date))
+        .map(renderPastShowCard);
+    if (ended) pastEventCards.unshift(card);
+    document.getElementById("pastEvents").innerHTML = pastEventCards.length
+        ? pastEventCards.join("")
+        : '<p class="event-empty">Past shows will appear here after they end.</p>';
     document.getElementById("photosContent").innerHTML = `
         <p id="photoStatus" class="photo-status" hidden></p>
         <div id="photoGrid" class="photo-grid"></div>`;
     renderConfiguredPhotos();
-    document.getElementById("eventTag").textContent = ended ? "🏁 Past Show" : "🎃 Upcoming Show";
-    document.getElementById("eventDate").textContent = formatShowDate();
+    if (currentShow === upcomingShow) renderEventDetail(upcomingShow);
+}
+
+let currentShow = upcomingShow;
+
+function openShow(show) {
+    currentShow = show;
+    try { sessionStorage.setItem("barrowCountyCruisersSelectedShow", show.id || upcomingShow.id); } catch {}
+    renderEventDetail(show);
+    openPage("event-detail");
+}
+
+function formatPastShowDate(show) {
+    return new Date(`${show.date}T12:00:00-04:00`).toLocaleDateString("en-US", {
+        month: "long", day: "numeric", year: "numeric", timeZone: "America/New_York"
+    });
+}
+
+function zeroCountdownDigits() {
+    ["days", "hours", "minutes", "seconds"].forEach(id => {
+        document.getElementById(id).textContent = "00";
+    });
+}
+
+function renderEventDetail(show) {
+    const isUpcoming = show === upcomingShow;
+    const date = isUpcoming ? formatShowDate() : formatPastShowDate(show);
+    const time = isUpcoming ? "4:00 PM – 8:00 PM" : show.time;
+    const location = show.location;
+    const flyer = document.getElementById("eventFlyer");
+    flyer.src = show.flyer;
+    flyer.alt = `${show.shortName || show.name} flyer`;
+    flyer.setAttribute("aria-label", `Open the ${show.shortName || show.name} flyer at full size`);
+    const supplementaryImage = document.getElementById("eventSupplementaryImage");
+    supplementaryImage.hidden = !show.supplementaryPhoto;
+    document.querySelector(".event-flyer-pair").classList.toggle("has-supplementary", Boolean(show.supplementaryPhoto));
+    supplementaryImage.src = show.supplementaryPhoto || "";
+    supplementaryImage.alt = show.supplementaryPhoto ? "Thank you to veterans photo" : "";
+    document.getElementById("eventTag").textContent = isUpcoming ? "🎃 Upcoming Show" : "🏁 Past Show";
+    document.getElementById("eventName").textContent = show.name;
+    document.getElementById("eventLocation").innerHTML = `${date}<br>${time}<br>${location}`;
+    document.getElementById("eventDetails").innerHTML = isUpcoming
+        ? `<div class="detail">📅 <b>${date}</b></div><div class="detail">🕓 <b>${time}</b></div><div class="detail">🎃 <b>Trunk or Treat: 5:00 PM – 7:00 PM</b></div><div class="detail">📍 <b>${location}</b></div>`
+        : `<div class="detail">📅 <b>${date}</b></div><div class="detail">🕓 <b>${time}</b></div><div class="detail">📍 <b>${location}</b></div><div class="detail">🇺🇸 <b>${show.note}</b></div>`;
+    document.getElementById("countdownArea").style.display = "block";
+    document.getElementById("countdownLabel").textContent = isUpcoming && !showHasEnded()
+        ? "Show starts in"
+        : "Show ended";
+    if (!isUpcoming || showHasEnded()) zeroCountdownDigits();
+    const status = document.getElementById("eventStatus");
+    status.style.display = isUpcoming && !showHasEnded() ? "none" : "block";
+    status.textContent = isUpcoming && !showHasEnded() ? "" : "🏁 Show Ended";
+    document.querySelector(".photos-link span:last-child").textContent = `Open ${show.shortName || show.name}’s photo gallery →`;
+    renderConfiguredPhotos();
 }
 
 function openPhotos() {
+    renderConfiguredPhotos();
     openPage("photos");
 }
+
+const photoRevealObserver = "IntersectionObserver" in window
+    ? new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            const figure = entry.target;
+            const image = figure.querySelector("img");
+            figure.dataset.inView = entry.isIntersecting ? "true" : "false";
+            if (!entry.isIntersecting) {
+                figure.classList.remove("is-visible");
+                return;
+            }
+
+            if (!image.dataset.requested) {
+                image.dataset.requested = "true";
+                image.src = image.dataset.src;
+            }
+            if (image.complete && image.naturalWidth > 0) {
+                requestAnimationFrame(() => figure.classList.add("is-visible"));
+            }
+        });
+    }, { rootMargin: "180px 0px", threshold: 0.05 })
+    : null;
 
 function renderConfiguredPhotos() {
     const grid = document.getElementById("photoGrid");
     const status = document.getElementById("photoStatus");
     if (!grid || !status) return;
+    if (photoRevealObserver) {
+        grid.querySelectorAll(".photo-item").forEach(figure => photoRevealObserver.unobserve(figure));
+    }
     grid.replaceChildren();
 
-    if (!upcomingShow.photos.length) {
-        status.hidden = true;
+    const photos = currentShow.photos || [];
+    if (!photos.length) {
+        status.hidden = false;
+        status.textContent = currentShow === upcomingShow
+            ? "No photos yet for this show. Check back after the event!"
+            : `No photos yet for ${currentShow.shortName || currentShow.name}. Check back later!`;
         return;
     }
 
     status.hidden = false;
-    status.textContent = `${upcomingShow.photos.length} photo${upcomingShow.photos.length === 1 ? "" : "s"} in this album. Click a photo to view it larger.`;
-    upcomingShow.photos.forEach(filename => {
+    const bannerNote = currentShow === upcomingShow ? "" : " Banner photos appear first.";
+    status.textContent = `${photos.length} photo${photos.length === 1 ? "" : "s"} in this album.${bannerNote} Click a photo to view it larger.`;
+    photos.forEach(photo => {
         const figure = document.createElement("figure");
         figure.className = "photo-item";
         const image = document.createElement("img");
-        image.src = `${PHOTO_FOLDER}${encodeURIComponent(filename)}`;
-        image.alt = filename;
+        image.dataset.src = photo.src;
+        image.alt = photo.filename;
         image.loading = "lazy";
+        image.decoding = "async";
+        image.fetchPriority = "low";
+        image.addEventListener("load", () => {
+            if (figure.dataset.inView === "true") {
+                requestAnimationFrame(() => figure.classList.add("is-visible"));
+            }
+        }, { once: true });
+        image.addEventListener("error", () => {
+            if (figure.dataset.inView === "true") figure.classList.add("is-visible");
+        }, { once: true });
         image.tabIndex = 0;
         image.setAttribute("role", "button");
-        image.addEventListener("click", () => openPhoto(image.src, filename));
+        image.addEventListener("click", () => openPhoto(image.src, photo.filename));
         image.addEventListener("keydown", event => {
             if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault();
-                openPhoto(image.src, filename);
+                openPhoto(image.src, photo.filename);
             }
         });
         const caption = document.createElement("figcaption");
-        caption.textContent = filename;
+        caption.textContent = photo.filename;
         figure.append(image, caption);
         grid.append(figure);
+        if (photoRevealObserver) {
+            photoRevealObserver.observe(figure);
+        } else {
+            image.src = photo.src;
+            figure.classList.add("is-visible");
+        }
     });
 }
 
@@ -4310,7 +4456,17 @@ document.addEventListener("click", event => {
     } catch {
         filename = image.alt || filename;
     }
-    openPhoto(source, image.alt || filename, filename, Boolean(image.closest(".event-preview")));
+    const eventCardWithDetails = image.closest(".event-preview[onclick]");
+    if (eventCardWithDetails?.dataset.showKind === "past") {
+        currentShow = pastShows[Number(eventCardWithDetails.dataset.showIndex)];
+        try { sessionStorage.setItem("barrowCountyCruisersSelectedShow", currentShow.id); } catch {}
+        renderEventDetail(currentShow);
+    } else if (eventCardWithDetails?.dataset.showKind === "upcoming") {
+        currentShow = upcomingShow;
+        try { sessionStorage.setItem("barrowCountyCruisersSelectedShow", currentShow.id); } catch {}
+        renderEventDetail(currentShow);
+    }
+    openPhoto(source, image.alt || filename, filename, Boolean(eventCardWithDetails));
 }, true);
 
 
@@ -6634,10 +6790,13 @@ function openPage(page) {
     });
 
 
+    const eventKey = page === "event-detail" || page === "photos"
+        ? `?${currentShow.id || upcomingShow.id}`
+        : "";
     history.replaceState(
         null,
         "",
-        "#" + page
+        "#" + page + eventKey
     );
 
 }
@@ -6679,6 +6838,17 @@ function updateCountdown() {
             "eventStatus"
         );
 
+    const countdownLabel = document.getElementById("countdownLabel");
+
+    if (currentShow !== upcomingShow) {
+        countdown.style.display = "block";
+        countdownLabel.textContent = "Show ended";
+        status.style.display = "block";
+        status.textContent = "🏁 Show Ended";
+        zeroCountdownDigits();
+        return;
+    }
+
 
     /* BEFORE EVENT */
 
@@ -6686,6 +6856,8 @@ function updateCountdown() {
 
         countdown.style.display =
             "block";
+
+        countdownLabel.textContent = "Show starts in";
 
         status.style.display =
             "none";
@@ -6791,6 +6963,8 @@ function updateCountdown() {
     countdown.style.display =
         "none";
 
+    zeroCountdownDigits();
+
     status.style.display =
         "block";
 
@@ -6812,11 +6986,16 @@ setInterval(
    OPEN HASH PAGE
    ========================================================== */
 
-const requestedPage =
-    location.hash.replace(
-        "#",
-        ""
-    );
+const [requestedPage, requestedEventId] = location.hash.slice(1).split("?");
+
+let savedEventId = "";
+try { savedEventId = sessionStorage.getItem("barrowCountyCruisersSelectedShow") || ""; } catch {}
+const restoreEventId = requestedEventId || savedEventId;
+
+if (restoreEventId) {
+    currentShow = pastShows.find(show => show.id === restoreEventId) || upcomingShow;
+    renderEventDetail(currentShow);
+}
 
 
 if (
