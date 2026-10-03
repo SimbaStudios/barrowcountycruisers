@@ -85,9 +85,8 @@ body::before {
    ========================================================= */
 
 header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    position: relative;
+    z-index: 2;
 
     background: rgba(8,7,12,.82);
     backdrop-filter: blur(18px);
@@ -111,15 +110,46 @@ header {
     display: flex;
     align-items: center;
 
+    padding: 0;
+    border: 0;
+    color: inherit;
+    background: transparent;
     cursor: pointer;
 
     font-size: 1.18rem;
     font-weight: 900;
+    font-family: inherit;
+    text-align: left;
+}
+
+.brand:focus-visible,
+.menu-card[role="button"]:focus-visible,
+.flyer:focus-visible {
+    outline: 2px solid var(--accent-light);
+    outline-offset: 4px;
 }
 
 nav {
     display: flex;
     gap: 5px;
+}
+
+.weather-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 11px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--muted);
+    background: rgba(255,255,255,.035);
+    font-size: .78rem;
+    white-space: nowrap;
+}
+
+.weather-indicator strong {
+    color: var(--text);
+    font-size: .84rem;
 }
 
 nav button {
@@ -902,11 +932,20 @@ nav button.active {
     max-width: none;
     max-height: 94vh;
     padding: 18px;
-    overflow: auto;
+    overflow: hidden;
     color: var(--text);
     border: 1px solid var(--border);
     border-radius: 18px;
     background: #100d16;
+}
+
+.photo-lightbox.is-opening {
+    animation: photoLightboxEnter .24s cubic-bezier(.2,.8,.2,1) both;
+}
+
+.photo-lightbox.is-closing {
+    animation: photoLightboxExit .2s ease-in both;
+    pointer-events: none;
 }
 
 .photo-lightbox::backdrop {
@@ -914,10 +953,47 @@ nav button.active {
     backdrop-filter: blur(6px);
 }
 
+.photo-lightbox.is-opening::backdrop {
+    animation: photoBackdropEnter .24s ease-out both;
+}
+
+.photo-lightbox.is-closing::backdrop {
+    animation: photoBackdropExit .2s ease-in both;
+}
+
+@keyframes photoLightboxEnter {
+    from { opacity: 0; transform: translateY(18px) scale(.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes photoLightboxExit {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to { opacity: 0; transform: translateY(12px) scale(.97); }
+}
+
+@keyframes photoBackdropEnter {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes photoBackdropExit {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .photo-lightbox.is-opening,
+    .photo-lightbox.is-closing,
+    .photo-lightbox.is-opening::backdrop,
+    .photo-lightbox.is-closing::backdrop {
+        animation-duration: .01ms;
+    }
+}
+
 .photo-lightbox img {
     display: block;
     max-width: 100%;
-    max-height: 78vh;
+    max-height: min(78vh, calc(94vh - 190px));
     margin: 0 auto;
     object-fit: contain;
 }
@@ -926,6 +1002,52 @@ nav button.active {
     padding: 12px 4px 2px;
     color: var(--muted);
     text-align: center;
+}
+
+.photo-lightbox figure {
+    margin: 0;
+}
+
+.photo-lightbox-actions {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 7px;
+    padding-top: 12px;
+}
+
+.photo-lightbox-download {
+    display: inline-block;
+    padding: 9px 14px;
+    border: 1px solid var(--border-accent);
+    border-radius: 9px;
+    color: var(--text);
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    font-weight: 750;
+    font-family: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.photo-lightbox-download:hover {
+    background: color-mix(in srgb, var(--accent) 24%, transparent);
+}
+
+.photo-lightbox-download[aria-busy="true"] {
+    opacity: .7;
+    pointer-events: none;
+}
+
+.photo-lightbox-download-status {
+    min-height: 1.2em;
+    color: var(--muted);
+    font-size: .82rem;
+    text-align: center;
+}
+
+img:not(#lightboxImage) {
+    cursor: zoom-in;
 }
 
 .photo-lightbox-close {
@@ -967,6 +1089,9 @@ nav button.active {
     font-size: .82rem;
     overflow-wrap: anywhere;
 }
+
+body.weather-unknown .weather-indicator { display: none; }
+body:not(.weather-unknown) .weather-indicator .weather-summary-short { display: none; }
 
 @media(max-width:600px) {
     .photo-album {
@@ -1135,6 +1260,20 @@ footer b {
     }
 }
 
+@media(max-width:600px) {
+    .weather-indicator {
+        padding: 6px 10px;
+        font-size: .74rem;
+    }
+
+    .weather-indicator .weather-location-label {
+        display: none;
+    }
+
+    .weather-summary-full { display: none; }
+    body:not(.weather-unknown) .weather-indicator .weather-summary-short { display: inline; }
+}
+
 @media(max-width:500px) {
 
     .container {
@@ -1257,7 +1396,7 @@ body {
         var(--bg);
 
     transition:
-        background .45s ease,
+        background 2s ease,
         color .35s ease;
 }
 
@@ -1581,7 +1720,7 @@ body.theme-spring {
 
 
 /* =========================================================
-   APRIL — SPRING SHOWERS
+   APRIL — SPRING
    Rain blue / fresh green
    ========================================================= */
 
@@ -2049,6 +2188,413 @@ footer {
     z-index: 2;
 }
 
+.environment-atmosphere {
+    position: fixed;
+    z-index: 1;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse at 15% 18%, rgba(35,74,139,.2), transparent 48%),
+        linear-gradient(180deg, rgba(3,7,18,.25), rgba(3,7,18,.1) 58%, rgba(2,4,11,.42));
+    transition: opacity 2s ease, filter 2s ease;
+}
+
+.night-moon {
+    position: fixed;
+    z-index: 1;
+    top: 13vh;
+    right: clamp(28px, 10vw, 150px);
+    width: clamp(48px, 6vw, 82px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 34% 30%, rgba(255,255,246,.98), rgba(220,230,239,.94) 58%, rgba(161,182,202,.9));
+    box-shadow: 0 0 28px rgba(204,224,255,.22), 0 0 90px rgba(145,183,230,.10);
+    transition: opacity 2s ease, filter 2s ease;
+}
+
+.night-moon::after {
+    position: absolute;
+    inset: 17% 20% 0 43%;
+    content: "";
+    border-radius: 50%;
+    background: rgba(122,148,172,.14);
+    filter: blur(4px);
+}
+
+body.time-night.weather-clear .night-moon { opacity: .48; }
+body.time-night.weather-partly-cloudy .night-moon { opacity: .22; }
+body.time-sunset.weather-clear .night-moon { opacity: .14; }
+body.time-sunset.weather-partly-cloudy .night-moon { opacity: .08; }
+body.theme-halloween .night-moon { filter: sepia(.28) hue-rotate(226deg) saturate(1.25); }
+body.theme-winter .night-moon,
+body.theme-christmas .night-moon { filter: saturate(.78) brightness(1.06); }
+
+body.time-night {
+    --night-panel-tint: #02040b;
+    --card: color-mix(in srgb, var(--panel) 62%, var(--night-panel-tint));
+    background:
+        radial-gradient(ellipse at 73% 11%, rgba(92,130,205,.17), transparent 36%),
+        radial-gradient(ellipse at 16% 45%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 46%),
+        linear-gradient(180deg,
+            color-mix(in srgb, var(--bg) 68%, #0b1730) 0%,
+            color-mix(in srgb, var(--bg) 82%, #01030a) 58%,
+            #020309 100%);
+}
+
+body.time-day {
+    --card: color-mix(in srgb, var(--panel) 90%, #fff3dc);
+    background:
+        radial-gradient(ellipse at 50% -8%, color-mix(in srgb, var(--accent-light) 25%, transparent), transparent 55%),
+        radial-gradient(ellipse at 88% 24%, color-mix(in srgb, var(--hero-glow-2) 90%, transparent), transparent 44%),
+        linear-gradient(180deg,
+            color-mix(in srgb, var(--bg) 58%, #73502e) 0%,
+            color-mix(in srgb, var(--bg) 76%, #3a2919) 48%,
+            var(--bg) 100%);
+}
+
+body.theme-winter.time-night { --night-panel-tint: #010b17; --glow: rgba(105,190,255,.17); }
+body.theme-valentine.time-night { --night-panel-tint: #180711; --glow: rgba(238,65,111,.17); }
+body.theme-spring.time-night,
+body.theme-showers.time-night { --night-panel-tint: #03110d; --glow: rgba(104,211,137,.16); }
+body.theme-late-spring.time-night { --night-panel-tint: #061108; --glow: rgba(178,208,93,.17); }
+body.theme-summer.time-night { --night-panel-tint: #03101a; --glow: rgba(57,194,216,.18); }
+body.theme-independence.time-night { --night-panel-tint: #030817; --glow: rgba(92,142,239,.18); }
+body.theme-fall.time-night,
+body.theme-thanksgiving.time-night { --night-panel-tint: #120a07; --glow: rgba(222,126,45,.17); }
+body.theme-halloween.time-night {
+    --night-panel-tint: #100718;
+    --glow: rgba(171,74,239,.2);
+    --hero-glow-1: rgba(255,112,24,.17);
+    --hero-glow-2: rgba(160,67,229,.13);
+}
+body.theme-christmas.time-night {
+    --night-panel-tint: #03100b;
+    --glow: rgba(87,188,125,.19);
+    --hero-glow-1: rgba(36,124,75,.16);
+    --hero-glow-2: rgba(220,166,62,.12);
+}
+body.theme-christmas.time-night .bulb {
+    animation-duration: 2.2s;
+    filter: brightness(1.18) saturate(1.12);
+}
+body.theme-christmas.time-night .bulb:nth-child(4n+1) { box-shadow: 0 0 20px 2px rgba(255,65,65,.82); }
+body.theme-christmas.time-night .bulb:nth-child(4n+2) { box-shadow: 0 0 20px 2px rgba(69,216,107,.82); }
+body.theme-christmas.time-night .bulb:nth-child(4n+3) { box-shadow: 0 0 20px 2px rgba(243,207,84,.84); }
+body.theme-christmas.time-night .bulb:nth-child(4n+4) { box-shadow: 0 0 20px 2px rgba(90,166,255,.82); }
+
+body.time-night .menu-card,
+body.time-night .event-card,
+body.time-night .about-box,
+body.time-sunset .menu-card,
+body.time-sunset .event-card,
+body.time-sunset .about-box {
+    background: linear-gradient(
+        145deg,
+        color-mix(in srgb, var(--panel) 60%, var(--night-panel-tint)),
+        color-mix(in srgb, var(--bg-soft) 64%, var(--night-panel-tint))
+    );
+    box-shadow: 0 18px 48px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.025);
+}
+
+body.time-day .menu-card,
+body.time-day .event-card,
+body.time-day .about-box {
+    background: linear-gradient(145deg,
+        color-mix(in srgb, var(--panel) 88%, #68451f),
+        color-mix(in srgb, var(--bg-soft) 91%, #3a2919));
+    box-shadow: 0 14px 38px rgba(0,0,0,.15), inset 0 1px rgba(255,255,255,.055);
+}
+
+body.time-night .environment-atmosphere {
+    opacity: .82;
+    background: linear-gradient(180deg, rgba(1,4,14,.34), rgba(1,3,11,.62));
+}
+
+body.weather-rain .environment-atmosphere,
+body.weather-heavy-rain .environment-atmosphere,
+body.weather-thunderstorm .environment-atmosphere {
+    opacity: .2;
+    filter: saturate(.78) brightness(.82);
+}
+
+body.weather-fog .environment-atmosphere::before,
+body.weather-fog .environment-atmosphere::after {
+    position: absolute;
+    right: -18%;
+    bottom: -8%;
+    left: -18%;
+    height: 62%;
+    content: "";
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 55%, rgba(193,205,211,.21), rgba(154,171,181,.09) 38%, transparent 72%);
+    filter: blur(36px);
+    animation: weatherFogDrift 54s ease-in-out infinite alternate;
+}
+
+body.weather-fog .environment-atmosphere::after {
+    right: -30%;
+    bottom: -18%;
+    left: -30%;
+    height: 48%;
+    opacity: .62;
+    background: radial-gradient(ellipse at 42% 50%, rgba(218,226,230,.16), rgba(161,174,181,.07) 42%, transparent 75%);
+    filter: blur(58px);
+    animation-duration: 78s;
+    animation-direction: alternate-reverse;
+}
+
+@keyframes weatherFogDrift {
+    from { transform: translate3d(-4%, 2%, 0) scale(1); }
+    to { transform: translate3d(5%, -2%, 0) scale(1.08); }
+}
+
+@media (max-width: 600px) {
+    body.weather-fog .environment-atmosphere::before { filter: blur(22px); }
+    body.weather-fog .environment-atmosphere::after { filter: blur(30px); opacity: .42; }
+}
+
+body.time-day.weather-clear .environment-atmosphere {
+    opacity: .1;
+    filter: saturate(1.04);
+    background:
+        radial-gradient(ellipse at 14% 0%, var(--hero-glow-1), transparent 54%),
+        radial-gradient(ellipse at 88% 15%, var(--hero-glow-2), transparent 48%);
+}
+
+body.time-night.weather-rain .environment-atmosphere,
+body.time-night.weather-thunderstorm .environment-atmosphere {
+    opacity: .7;
+}
+
+body.weather-heavy-rain .environment-atmosphere { opacity: .3; }
+body.time-night.weather-heavy-rain .environment-atmosphere { opacity: .78; }
+
+body.time-sunset .environment-atmosphere {
+    opacity: .3;
+    background:
+        radial-gradient(ellipse at 50% 100%, rgba(236,111,56,.18), transparent 56%),
+        linear-gradient(180deg, rgba(22,13,37,.12), rgba(6,8,16,.28));
+}
+
+body.time-sunset {
+    --night-panel-tint: #1a0e21;
+    --card: color-mix(in srgb, var(--panel) 88%, var(--night-panel-tint));
+    background:
+        radial-gradient(ellipse at 52% 88%, rgba(255,128,68,.28), transparent 50%),
+        radial-gradient(ellipse at 86% 70%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 48%),
+        linear-gradient(180deg,
+            color-mix(in srgb, var(--bg) 78%, #24152f),
+            color-mix(in srgb, var(--bg) 72%, #5b302b) 64%,
+            var(--bg));
+}
+
+body.time-night header {
+    background: rgba(2,4,12,.94);
+    border-bottom-color: rgba(147,177,239,.18);
+}
+
+body.time-day header {
+    background: color-mix(in srgb, var(--bg) 76%, transparent);
+    border-bottom-color: color-mix(in srgb, var(--accent-light) 24%, transparent);
+}
+
+body.weather-partly-cloudy .environment-atmosphere {
+    opacity: max(.12, var(--night-overlay, 0));
+    filter: saturate(.86);
+    background-size: 150% 130%;
+    animation: cloudDrift 72s ease-in-out infinite alternate;
+}
+
+body.weather-overcast .environment-atmosphere {
+    opacity: max(.24, var(--night-overlay, 0));
+    filter: saturate(.62) brightness(.82);
+    background-size: 150% 130%;
+    animation: cloudDrift 58s ease-in-out infinite alternate;
+}
+
+body.weather-fog .environment-atmosphere {
+    opacity: max(.32, var(--night-overlay, 0));
+    filter: blur(2px) saturate(.76);
+    background:
+        radial-gradient(ellipse at 25% 82%, rgba(179,192,204,.16), transparent 52%),
+        radial-gradient(ellipse at 75% 75%, rgba(119,134,155,.13), transparent 55%);
+}
+
+body.weather-snow .environment-atmosphere {
+    opacity: .08;
+}
+
+body.time-night.weather-snow .environment-atmosphere {
+    opacity: .42;
+}
+
+@keyframes cloudDrift {
+    from { background-position: 0% 15%; }
+    to { background-position: 100% 80%; }
+}
+
+body.time-night.weather-partly-cloudy { --night-overlay: .58; }
+body.time-night.weather-overcast { --night-overlay: .62; }
+body.time-night.weather-fog { --night-overlay: .64; }
+body.time-night.weather-rain,
+body.time-night.weather-heavy-rain,
+body.time-night.weather-thunderstorm { --night-overlay: .72; }
+body.time-night.weather-snow { --night-overlay: .42; }
+
+.lightning-visual {
+    position: fixed;
+    z-index: 1;
+    inset: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.lightning-visual::before {
+    position: absolute;
+    inset: 0;
+    content: "";
+    background:
+        radial-gradient(ellipse at var(--strike-x, 54vw) 4%, rgba(165,213,255,.36), transparent 38%),
+        linear-gradient(180deg, rgba(178,220,255,.13), transparent 57%);
+}
+
+.lightning-visual svg {
+    position: absolute;
+    top: -3vh;
+    left: var(--strike-x, 54vw);
+    width: clamp(100px, 18vw, 245px);
+    height: 106vh;
+    overflow: visible;
+    transform: translateX(-50%) scaleX(var(--bolt-scale, 1));
+}
+
+.lightning-shape { display: none; }
+.lightning-visual[data-shape="1"] .lightning-shape-1,
+.lightning-visual[data-shape="2"] .lightning-shape-2,
+.lightning-visual[data-shape="3"] .lightning-shape-3,
+.lightning-visual[data-shape="4"] .lightning-shape-4 { display: block; }
+
+.lightning-bolt-glow,
+.lightning-branch-glow {
+    fill: none;
+    stroke: rgba(101,177,255,.94);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 22;
+    filter: drop-shadow(0 0 12px rgba(103,177,255,.95));
+}
+
+.lightning-bolt-core,
+.lightning-branch-core {
+    fill: none;
+    stroke: #f4fbff;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 7;
+    filter: drop-shadow(0 0 5px rgba(213,240,255,.98));
+}
+
+.lightning-branch-glow { stroke-width: 15; }
+.lightning-branch-core { stroke-width: 5; }
+
+body.lightning-flash .lightning-visual {
+    animation: lightningBoltFlash .68s steps(1,end) both;
+}
+
+body.lightning-flash .environment-atmosphere {
+    animation: stormGlow .68s ease-out;
+}
+
+body.page-hidden .seasonal-bat,
+body.page-hidden .halloween-fog,
+body.page-hidden .christmas-lights,
+body.page-hidden .santa-flyby,
+body.page-hidden .witch-flyby,
+body.page-hidden .falling-present,
+body.page-hidden .environment-atmosphere,
+body.page-hidden .environment-atmosphere::before,
+body.page-hidden .environment-atmosphere::after {
+    animation-play-state: paused !important;
+}
+
+body.page-hidden .lightning-visual { animation-play-state: paused !important; }
+
+@keyframes stormGlow {
+    0%, 100% { filter: brightness(1); }
+    5% { filter: brightness(1.9) saturate(1.25); }
+    14% { filter: brightness(.82); }
+    23% { filter: brightness(1.58) saturate(1.18); }
+    31% { filter: brightness(.94); }
+    40% { filter: brightness(1.22); }
+    68% { filter: brightness(1.04); }
+}
+
+@keyframes lightningBoltFlash {
+    0%, 100% { opacity: 0; }
+    4% { opacity: 1; }
+    11% { opacity: .12; }
+    18% { opacity: .84; }
+    25% { opacity: .04; }
+    33% { opacity: .32; }
+    43% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .environment-atmosphere,
+    .environment-atmosphere::before,
+    .environment-atmosphere::after,
+    .night-moon { transition: none; animation: none !important; }
+    .lightning-visual { display: none !important; }
+}
+
+.environment-dev-tools {
+    position: fixed;
+    right: max(14px, calc(env(safe-area-inset-right) + 14px));
+    bottom: max(72px, calc(env(safe-area-inset-bottom) + 14px));
+    z-index: 30;
+    display: none;
+    width: min(390px, calc(100vw - 28px));
+    max-height: min(70vh, 620px, calc(100vh - 90px));
+    overflow: auto;
+    border: 1px solid var(--border-accent);
+    border-radius: 14px;
+    color: var(--text);
+    background: color-mix(in srgb, var(--panel-solid, #111417) 94%, transparent);
+    box-shadow: 0 18px 50px rgba(0,0,0,.42);
+    backdrop-filter: blur(16px);
+    font-size: .82rem;
+}
+
+body.dev-environment-enabled .environment-dev-tools { display: block; }
+.environment-dev-tools summary { padding: 12px 14px; cursor: pointer; font-weight: 800; }
+.environment-dev-content { display: grid; gap: 10px; padding: 0 14px 14px; }
+.environment-dev-content label { display: grid; gap: 4px; color: var(--muted); }
+.environment-dev-content select,
+.environment-dev-content button,
+.environment-dev-content input[type="range"] {
+    min-height: 36px;
+    padding: 7px 9px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    background: var(--bg-soft);
+    font: inherit;
+}
+.environment-dev-content button { cursor: pointer; font-weight: 700; }
+.environment-dev-content .dev-actions { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }
+.environment-dev-content .dev-scenarios { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px; }
+.environment-dev-content .dev-help { margin: 0; color: var(--muted); line-height: 1.4; }
+.environment-dev-content .dev-wind-row { display: grid; grid-template-columns: minmax(0,1fr) 72px; align-items: center; gap: 8px; }
+.environment-dev-content output { color: var(--text); text-align: right; font-variant-numeric: tabular-nums; }
+.environment-dev-content .dev-reset { width: 100%; border-color: var(--border-accent); }
+.environment-dev-status { min-height: 1.25em; color: var(--accent-light); }
+
 #seasonCanvas {
     position: fixed;
     inset: 0;
@@ -2122,84 +2668,51 @@ body.theme-halloween .halloween-bats { display: block; }
 .seasonal-bat {
     position: absolute;
     top: var(--bat-top, 16%);
-    left: -72px;
-    width: 52px;
-    height: 25px;
-    color: #1b1025;
-    opacity: .72;
-    filter: drop-shadow(0 2px 5px rgba(158,39,223,.36));
-    animation: batCross var(--bat-speed, 24s) linear var(--bat-delay, 0s) infinite;
+    left: -100px;
+    width: var(--bat-width, 74px);
+    height: var(--bat-height, 46px);
+    color: var(--bat-color, #170e20);
+    opacity: 0;
+    filter: drop-shadow(0 3px 3px rgba(0,0,0,.58)) drop-shadow(0 0 7px rgba(172,91,255,.36));
+    animation: batCross var(--bat-speed, 96s) linear var(--bat-delay, 0s) infinite;
+    will-change: translate;
 }
 
-.seasonal-bat:nth-child(2) { --bat-top: 28%; --bat-speed: 31s; --bat-delay: -13s; }
-.seasonal-bat:nth-child(2) .bat-wing { width: 22px; height: 16px; }
-.seasonal-bat:nth-child(2)::before { width: 9px; height: 13px; }
-.seasonal-bat:nth-child(3) { --bat-top: 12%; --bat-speed: 27s; --bat-delay: -20s; }
-.seasonal-bat:nth-child(3) .bat-wing { width: 18px; height: 13px; }
-.seasonal-bat:nth-child(3)::before { width: 7px; height: 11px; }
+.seasonal-bat:nth-child(2) { --bat-top: 30%; --bat-width: 64px; --bat-speed: 108s; --bat-delay: -28s; --bat-color: #24122f; }
+.seasonal-bat:nth-child(3) { --bat-top: 17%; --bat-width: 54px; --bat-speed: 100s; --bat-delay: -59s; --bat-color: #211426; }
 
-.seasonal-bat::before {
-    position: absolute;
-    z-index: 2;
-    content: "";
-    left: 50%;
-    top: 5px;
-    width: 11px;
-    height: 15px;
-    border-radius: 50% 50% 45% 45%;
-    background: currentColor;
-    transform: translateX(-50%);
+.bat-illustration { display: block; width: 100%; height: 100%; overflow: visible; }
+.bat-wing-art {
+    fill: currentColor;
+    stroke: rgba(218,177,244,.3);
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+    transform-box: view-box;
 }
-
-.seasonal-bat::after {
-    position: absolute;
-    z-index: 3;
-    content: "";
-    left: 50%;
-    top: 8px;
-    width: 4px;
-    height: 2px;
-    border-radius: 50%;
-    background: #ffa331;
-    box-shadow: 4px 0 #ffa331;
-    transform: translateX(-50%);
-}
-
-.bat-wing {
-    position: absolute;
-    top: 3px;
-    width: 28px;
-    height: 20px;
-    background: currentColor;
-    clip-path: polygon(0 0, 24% 17%, 43% 0, 62% 19%, 82% 2%, 100% 9%, 88% 100%, 69% 62%, 50% 100%, 29% 62%, 10% 100%);
-}
-
-.bat-wing-left {
-    left: 0;
-    transform-origin: right center;
-    animation: batFlapLeft .48s ease-in-out infinite alternate;
-}
-
-.bat-wing-right {
-    right: 0;
-    transform: scaleX(-1);
-    transform-origin: left center;
-    animation: batFlapRight .48s ease-in-out infinite alternate;
-}
+.bat-wing-art-left { transform-origin: 60px 30px; animation: batFlapLeft .62s ease-in-out infinite alternate; }
+.bat-wing-art-right { transform-origin: 60px 30px; animation: batFlapRight .62s ease-in-out infinite alternate; }
+.bat-body-art { fill: #100b16; stroke: rgba(218,177,244,.44); stroke-width: 1.2; }
+.bat-ear-art { fill: #17101d; stroke: rgba(218,177,244,.38); stroke-width: 1; }
+.bat-eye-art { fill: #ffd574; filter: drop-shadow(0 0 3px rgba(255,191,82,.95)); }
+.bat-fur-art { fill: rgba(199,151,222,.48); }
 
 @keyframes batFlapLeft {
-    from { transform: rotate(13deg) scaleY(.42); }
-    to { transform: rotate(-12deg) scaleY(1); }
+    from { transform: rotate(12deg) scaleY(.66); }
+    to { transform: rotate(-9deg) scaleY(1); }
 }
-
 @keyframes batFlapRight {
-    from { transform: scaleX(-1) rotate(13deg) scaleY(.42); }
-    to { transform: scaleX(-1) rotate(-12deg) scaleY(1); }
+    from { transform: rotate(-12deg) scaleY(.66); }
+    to { transform: rotate(9deg) scaleY(1); }
 }
 
 @keyframes batCross {
-    from { translate: 0 0; }
-    to { translate: calc(100vw + 160px) -24px; }
+    0% { translate: 0 0; rotate: -7deg; opacity: 0; scale: .72; }
+    4% { opacity: 0; }
+    9% { opacity: .94; }
+    21% { translate: 28vw -34px; rotate: 5deg; }
+    33% { translate: 63vw 25px; rotate: -4deg; }
+    42% { translate: calc(100vw + 200px) 14px; rotate: -6deg; opacity: 0; scale: 1.05; }
+    100% { translate: calc(100vw + 200px) 14px; rotate: -6deg; opacity: 0; scale: 1.05; }
 }
 
 .christmas-lights {
@@ -2615,13 +3128,209 @@ body.theme-christmas .gift-drop-layer { display: block; }
     100% { transform: translate(-50%, -50%) translate(60vw, 10px) rotate(-2deg); }
 }
 
+.witch-flyby {
+    position: fixed;
+    top: 43%;
+    left: 50%;
+    z-index: 1;
+    display: none;
+    width: clamp(230px, 34vw, 340px);
+    height: clamp(135px, 20vw, 190px);
+    pointer-events: none;
+    opacity: 0;
+    filter: drop-shadow(0 7px 14px rgba(31,9,48,.62)) drop-shadow(0 0 18px rgba(180,94,255,.22));
+    transform: translate(-50%, -50%);
+}
+
+body.theme-halloween .witch-flyby.is-flying {
+    display: block;
+    animation: witchFlyBy 14s cubic-bezier(.42,0,.58,1) both;
+}
+
+.witch-art {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.witch-broom {
+    position: absolute;
+    z-index: 1;
+    left: 8%;
+    top: 68%;
+    width: 88%;
+    height: 7px;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #d8a657, #70421f 65%, #432719);
+    transform: rotate(-7deg);
+}
+
+.witch-broom::before {
+    position: absolute;
+    content: "";
+    right: -5%;
+    top: -10px;
+    width: 23%;
+    height: 27px;
+    border-radius: 3px 70% 70% 3px;
+    background: repeating-linear-gradient(105deg, #b98643 0 4px, #72502d 4px 7px);
+    clip-path: polygon(0 15%, 100% 0, 89% 100%, 0 82%);
+}
+
+.witch-rider {
+    position: absolute;
+    z-index: 2;
+    left: 34%;
+    top: 13%;
+    width: 34%;
+    height: 74%;
+    transform: rotate(-8deg);
+}
+
+.witch-cloak {
+    position: absolute;
+    left: 9%;
+    bottom: 0;
+    width: 82%;
+    height: 70%;
+    border-radius: 44% 45% 15% 18%;
+    background: linear-gradient(115deg, #58336e, #25172f 58%, #120e1a);
+    clip-path: polygon(25% 0, 73% 0, 100% 100%, 0 78%);
+}
+
+.witch-cloak::after {
+    position: absolute;
+    content: "";
+    left: 36%;
+    top: 3%;
+    width: 22%;
+    height: 60%;
+    border-left: 2px solid rgba(213,173,235,.4);
+    transform: rotate(-12deg);
+}
+
+.witch-head {
+    position: absolute;
+    z-index: 3;
+    left: 25%;
+    top: 7%;
+    width: 43%;
+    aspect-ratio: 1;
+    border-radius: 48% 48% 44% 44%;
+    background: #b9bd78;
+    box-shadow: inset -4px -3px rgba(46,51,28,.25);
+}
+
+.witch-head::before {
+    position: absolute;
+    content: "";
+    left: 26%;
+    top: 44%;
+    width: 5px;
+    height: 4px;
+    border-radius: 50%;
+    background: #271b2c;
+    box-shadow: 12px 0 #271b2c, 6px 8px 0 -1px #765045;
+}
+
+.witch-hair {
+    position: absolute;
+    z-index: 2;
+    left: 13%;
+    top: 9%;
+    width: 59%;
+    height: 42%;
+    border-radius: 50% 50% 30% 35%;
+    background: #30223a;
+    box-shadow: -8px 13px 0 -2px #49324f, 13px 16px 0 -4px #241b30;
+}
+
+.witch-hat {
+    position: absolute;
+    z-index: 5;
+    left: 7%;
+    top: -13%;
+    width: 79%;
+    height: 39%;
+    transform: rotate(-8deg);
+}
+
+.witch-hat-tip {
+    position: absolute;
+    left: 25%;
+    top: 0;
+    width: 55%;
+    height: 86%;
+    background: linear-gradient(145deg, #55346a, #1e1729 80%);
+    clip-path: polygon(16% 100%, 71% 0, 100% 100%);
+    transform: rotate(12deg);
+}
+
+.witch-hat-brim {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 18%;
+    border-radius: 50%;
+    background: linear-gradient(#392447, #17121f);
+    box-shadow: 0 3px 0 #a96bd1;
+}
+
+.witch-hat-band {
+    position: absolute;
+    z-index: 1;
+    left: 31%;
+    bottom: 13%;
+    width: 39%;
+    height: 7%;
+    border-radius: 3px;
+    background: #f2a949;
+}
+
+.witch-arm {
+    position: absolute;
+    z-index: 4;
+    right: -4%;
+    top: 48%;
+    width: 50%;
+    height: 9%;
+    border-radius: 10px;
+    background: #33203e;
+    transform: rotate(25deg);
+    transform-origin: left center;
+}
+
+.witch-arm::after {
+    position: absolute;
+    content: "";
+    right: -4px;
+    top: -3px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #b9bd78;
+}
+
+@keyframes witchFlyBy {
+    0% { opacity: 0; transform: translate(-50%, -50%) translate(-65vw, 24vh) rotate(-8deg) scale(.8); }
+    10% { opacity: .94; }
+    28% { transform: translate(-50%, -50%) translate(-38vw, 5vh) rotate(1deg) scale(1); }
+    50% { transform: translate(-50%, -50%) translate(0, -9vh) rotate(-2deg) scale(1.04); }
+    74% { transform: translate(-50%, -50%) translate(34vw, 4vh) rotate(2deg) scale(.98); }
+    90% { opacity: .94; }
+    100% { opacity: 0; transform: translate(-50%, -50%) translate(68vw, -18vh) rotate(8deg) scale(.82); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-    #seasonCanvas { display: none; }
-    body.theme-christmas .christmas-lights { display: none; }
+    html { scroll-behavior: auto; }
+    .page { animation: none; }
+    body.theme-christmas .christmas-lights .bulb { animation: none; opacity: .82; }
     body.theme-christmas .santa-flyby.is-flying { display: none; animation: none; }
     body.theme-christmas .gift-drop-layer { display: none; }
     body.theme-halloween .halloween-bats { display: none; }
     body.theme-halloween .halloween-fog { animation: none; }
+    body.theme-halloween .witch-flyby.is-flying { display: none; animation: none; }
 }
 
 @media (max-width: 850px) {
@@ -2643,23 +3352,81 @@ body.theme-christmas .santa-flyby.is-flying .santa-arm {
 
 <body>
 
+<div class="environment-atmosphere" aria-hidden="true"></div>
 <canvas id="seasonCanvas" aria-hidden="true"></canvas>
+<div class="lightning-visual" id="lightningVisual" aria-hidden="true">
+    <svg viewBox="0 0 300 900" preserveAspectRatio="none" focusable="false">
+        <g class="lightning-shape lightning-shape-1">
+            <path class="lightning-bolt-glow" d="M172 -30 106 220 181 207 88 430 151 408 119 760 235 423 175 447 263 201 193 221 238 -30" />
+            <path class="lightning-bolt-core" d="M172 -30 106 220 181 207 88 430 151 408 119 760 235 423 175 447 263 201 238 -30" />
+            <path class="lightning-branch-glow" d="M126 329 48 458 104 446 67 555" />
+            <path class="lightning-branch-core" d="M126 329 48 458 104 446 67 555" />
+        </g>
+        <g class="lightning-shape lightning-shape-2">
+            <path class="lightning-bolt-glow" d="M82 -30 166 198 93 212 214 397 141 387 221 704 101 442 156 450 45 220 119 230 70 -30" />
+            <path class="lightning-bolt-core" d="M82 -30 166 198 93 212 214 397 141 387 221 704 101 442 156 450 45 220 119 230 70 -30" />
+            <path class="lightning-branch-glow" d="M145 324 235 426 177 418 246 529" />
+            <path class="lightning-branch-core" d="M145 324 235 426 177 418 246 529" />
+        </g>
+        <g class="lightning-shape lightning-shape-3">
+            <path class="lightning-bolt-glow" d="M215 -30 132 186 211 211 105 381 171 376 66 659 217 435 155 446 258 247 187 257 247 -30" />
+            <path class="lightning-bolt-core" d="M215 -30 132 186 211 211 105 381 171 376 66 659 217 435 155 446 258 247 187 257 247 -30" />
+            <path class="lightning-branch-glow" d="M170 285 80 340 131 350 37 464" />
+            <path class="lightning-branch-core" d="M170 285 80 340 131 350 37 464" />
+            <path class="lightning-branch-glow" d="M125 430 75 548" />
+            <path class="lightning-branch-core" d="M125 430 75 548" />
+        </g>
+        <g class="lightning-shape lightning-shape-4">
+            <path class="lightning-bolt-glow" d="M125 -30 204 155 127 202 232 310 154 323 245 555 121 442 180 426 58 272 139 260 74 -30" />
+            <path class="lightning-bolt-core" d="M125 -30 204 155 127 202 232 310 154 323 245 555 121 442 180 426 58 272 139 260 74 -30" />
+            <path class="lightning-branch-glow" d="M162 333 243 380 192 390 268 465" />
+            <path class="lightning-branch-core" d="M162 333 243 380 192 390 268 465" />
+        </g>
+    </svg>
+</div>
+<div class="night-moon" aria-hidden="true"></div>
 <div class="ambient one" aria-hidden="true"></div>
 <div class="ambient two" aria-hidden="true"></div>
 <div class="halloween-fog" aria-hidden="true"></div>
 <div class="halloween-bats" aria-hidden="true">
     <span class="seasonal-bat">
-        <i class="bat-wing bat-wing-left"></i>
-        <i class="bat-wing bat-wing-right"></i>
+        <svg class="bat-illustration" viewBox="0 0 120 64" aria-hidden="true">
+            <g class="bat-wing-art bat-wing-art-left"><path d="M60 29 51 23 44 11 41 22 30 14 32 28 17 23 23 36 5 37 19 46 15 52 34 50 39 58 47 49 60 46Z"/></g>
+            <g class="bat-wing-art bat-wing-art-right"><path d="M60 29 69 23 76 11 79 22 90 14 88 28 103 23 97 36 115 37 101 46 105 52 86 50 81 58 73 49 60 46Z"/></g>
+            <path class="bat-ear-art" d="m48 25 2-17 10 13 10-13 2 17-3 22H51Z"/>
+            <path class="bat-body-art" d="M49 29q11-9 22 0l-2 17q-2 9-9 14-7-5-9-14Z"/>
+            <path class="bat-fur-art" d="m54 42 6 3 6-3-2 8-4 5-4-5Z"/>
+            <circle class="bat-eye-art" cx="55" cy="33" r="1.5"/><circle class="bat-eye-art" cx="65" cy="33" r="1.5"/>
+        </svg>
     </span>
     <span class="seasonal-bat">
-        <i class="bat-wing bat-wing-left"></i>
-        <i class="bat-wing bat-wing-right"></i>
+        <svg class="bat-illustration" viewBox="0 0 120 64" aria-hidden="true">
+            <g class="bat-wing-art bat-wing-art-left"><path d="M60 29 51 23 44 11 41 22 30 14 32 28 17 23 23 36 5 37 19 46 15 52 34 50 39 58 47 49 60 46Z"/></g><g class="bat-wing-art bat-wing-art-right"><path d="M60 29 69 23 76 11 79 22 90 14 88 28 103 23 97 36 115 37 101 46 105 52 86 50 81 58 73 49 60 46Z"/></g>
+            <path class="bat-ear-art" d="m48 25 2-17 10 13 10-13 2 17-3 22H51Z"/><path class="bat-body-art" d="M49 29q11-9 22 0l-2 17q-2 9-9 14-7-5-9-14Z"/><path class="bat-fur-art" d="m54 42 6 3 6-3-2 8-4 5-4-5Z"/><circle class="bat-eye-art" cx="55" cy="33" r="1.5"/><circle class="bat-eye-art" cx="65" cy="33" r="1.5"/>
+        </svg>
     </span>
     <span class="seasonal-bat">
-        <i class="bat-wing bat-wing-left"></i>
-        <i class="bat-wing bat-wing-right"></i>
+        <svg class="bat-illustration" viewBox="0 0 120 64" aria-hidden="true">
+            <g class="bat-wing-art bat-wing-art-left"><path d="M60 29 51 23 44 11 41 22 30 14 32 28 17 23 23 36 5 37 19 46 15 52 34 50 39 58 47 49 60 46Z"/></g><g class="bat-wing-art bat-wing-art-right"><path d="M60 29 69 23 76 11 79 22 90 14 88 28 103 23 97 36 115 37 101 46 105 52 86 50 81 58 73 49 60 46Z"/></g>
+            <path class="bat-ear-art" d="m48 25 2-17 10 13 10-13 2 17-3 22H51Z"/><path class="bat-body-art" d="M49 29q11-9 22 0l-2 17q-2 9-9 14-7-5-9-14Z"/><path class="bat-fur-art" d="m54 42 6 3 6-3-2 8-4 5-4-5Z"/><circle class="bat-eye-art" cx="55" cy="33" r="1.5"/><circle class="bat-eye-art" cx="65" cy="33" r="1.5"/>
+        </svg>
     </span>
+</div>
+<div class="witch-flyby" id="witchFlyby" aria-hidden="true">
+    <div class="witch-art">
+        <div class="witch-broom"></div>
+        <div class="witch-rider">
+            <div class="witch-cloak"></div>
+            <div class="witch-hair"></div>
+            <div class="witch-head"></div>
+            <div class="witch-hat">
+                <i class="witch-hat-tip"></i>
+                <i class="witch-hat-brim"></i>
+                <i class="witch-hat-band"></i>
+            </div>
+            <div class="witch-arm"></div>
+        </div>
+    </div>
 </div>
 <div class="christmas-lights" id="christmasLights" aria-hidden="true"></div>
 <div class="santa-flyby" id="santaFlyby" aria-hidden="true">
@@ -2692,13 +3459,18 @@ body.theme-christmas .santa-flyby.is-flying .santa-arm {
 
 <div class="nav">
 
-    <div class="brand"
-         onclick="openPage('home')">
+    <button class="brand" type="button"
+            onclick="openPage('home')">
 
         Barrow County Cruisers
 
-    </div>
+    </button>
 
+    <div class="weather-indicator" id="weatherIndicator" aria-live="polite">
+        <span class="weather-location-label">Winder</span>
+        <strong id="weatherTemperature">--°</strong>
+        <span id="weatherSummary"><span class="weather-summary-full"></span><span class="weather-summary-short"></span></span>
+    </div>
 
     <nav>
 
@@ -2789,7 +3561,10 @@ body.theme-christmas .santa-flyby.is-flying .santa-arm {
 
         <div
             class="menu-card"
-            onclick="openPage('events')">
+            role="button"
+            tabindex="0"
+            onclick="openPage('events')"
+            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPage('events')}">
 
             <div class="menu-icon">
                 📅
@@ -2957,7 +3732,11 @@ body.theme-christmas .santa-flyby.is-flying .santa-arm {
                 id="eventFlyer"
                 class="flyer"
                 src=""
-                alt="Barrow County Cruisers Trunk or Treat flyer">
+                alt="Barrow County Cruisers Trunk or Treat flyer"
+                role="button"
+                tabindex="0"
+                aria-label="Open the Trunk or Treat flyer at full size"
+                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
 
         </div>
 
@@ -3198,6 +3977,11 @@ body.theme-christmas .santa-flyby.is-flying .santa-arm {
         <img id="lightboxImage" src="" alt="">
         <figcaption id="lightboxCaption"></figcaption>
     </figure>
+    <div class="photo-lightbox-actions">
+        <button id="lightboxEventDetails" class="photo-lightbox-download" type="button" hidden onclick="openEventDetailsFromLightbox()">View event details</button>
+        <a id="lightboxDownload" class="photo-lightbox-download" href="" download onclick="downloadPhoto(event)">Download image</a>
+        <span id="lightboxDownloadStatus" class="photo-lightbox-download-status" role="status" aria-live="polite"></span>
+    </div>
 </dialog>
 
 <footer>
@@ -3215,6 +3999,81 @@ body.theme-christmas .santa-flyby.is-flying .santa-arm {
     Cars • Bikes • Trucks • Community
 
 </footer>
+
+<!-- Developer testing controls appear only when ?dev=1 is added to the URL. -->
+<details class="environment-dev-tools" id="environmentDevTools">
+    <summary>Theme &amp; weather test controls</summary>
+    <div class="environment-dev-content">
+        <p class="dev-help">Change a control to test it immediately. Quick scenarios combine season, time, weather and wind. Reset returns everything to live automatic settings.</p>
+        <label>Season
+            <select id="devSeason">
+                <option value="auto">Automatic</option>
+                <option value="default">Georgia Red</option>
+                <option value="winter">Winter</option>
+                <option value="valentine">Valentine</option>
+                <option value="spring">Early Spring (March)</option>
+                <option value="showers">Spring (April)</option>
+                <option value="late-spring">Late Spring</option>
+                <option value="summer">Summer</option>
+                <option value="independence">Independence Day</option>
+                <option value="fall">Fall</option>
+                <option value="halloween">Halloween</option>
+                <option value="thanksgiving">Thanksgiving</option>
+                <option value="christmas">Christmas</option>
+            </select>
+        </label>
+        <label>Time of day
+            <select id="devTime">
+                <option value="auto">Automatic</option>
+                <option value="day">Day</option>
+                <option value="sunset">Sunset</option>
+                <option value="night">Night</option>
+            </select>
+        </label>
+        <label>Weather
+            <select id="devWeather">
+                <option value="live">Live weather</option>
+                <option value="clear">Clear</option>
+                <option value="partly-cloudy">Partly cloudy</option>
+                <option value="overcast">Cloudy</option>
+                <option value="rain">Rain</option>
+                <option value="heavy-rain">Heavy rain</option>
+                <option value="thunderstorm">Thunderstorm</option>
+                <option value="snow">Snow</option>
+                <option value="fog">Fog</option>
+            </select>
+        </label>
+        <label for="devWindSpeed">Wind speed</label>
+        <div class="dev-wind-row">
+            <input id="devWindSpeed" type="range" min="0" max="35" step="1" value="0" aria-label="Test wind speed in miles per hour">
+            <output id="devWindSpeedValue" for="devWindSpeed">Live</output>
+        </div>
+        <label>Wind direction
+            <select id="devWindDirection">
+                <option value="live">Live Winder direction</option>
+                <option value="0">From the north</option>
+                <option value="90">From the east</option>
+                <option value="180">From the south</option>
+                <option value="270">From the west</option>
+            </select>
+        </label>
+        <div class="dev-scenarios" aria-label="Quick environment test scenarios">
+            <button type="button" data-dev-preset="rainy-day">Rainy day</button>
+            <button type="button" data-dev-preset="rainy-night">Rainy night</button>
+            <button type="button" data-dev-preset="halloween-rain">Halloween rain</button>
+            <button type="button" data-dev-preset="christmas-snow">Christmas snow</button>
+            <button type="button" data-dev-preset="independence-night">July 4 night</button>
+            <button type="button" data-dev-preset="fall-wind">Fall wind</button>
+        </div>
+        <button id="devReset" class="dev-reset" type="button">Reset all to live automatic</button>
+        <div class="dev-actions">
+            <button id="devFirework" type="button">Firework</button>
+            <button id="devLightning" type="button">Lightning</button>
+            <button id="devRain" type="button">More rain</button>
+        </div>
+        <div class="environment-dev-status" id="environmentDevStatus" role="status" aria-live="polite"></div>
+    </div>
+</details>
 
 
 
@@ -3293,13 +4152,6 @@ function renderEventSections() {
     document.getElementById("pastEvents").innerHTML = ended
         ? card : '<p class="event-empty">Past shows will appear here after they end.</p>';
     document.getElementById("photosContent").innerHTML = `
-        <div id="photoEmpty" class="empty">
-            <div class="empty-inner">
-                <div class="empty-icon">📷</div>
-                <h2>No Show Photos Yet</h2>
-                <p>Photos from the Barrow County Cruisers Trunk or Treat will appear here after the show.</p>
-            </div>
-        </div>
         <p id="photoStatus" class="photo-status" hidden></p>
         <div id="photoGrid" class="photo-grid"></div>`;
     renderConfiguredPhotos();
@@ -3314,17 +4166,14 @@ function openPhotos() {
 function renderConfiguredPhotos() {
     const grid = document.getElementById("photoGrid");
     const status = document.getElementById("photoStatus");
-    const empty = document.getElementById("photoEmpty");
     if (!grid || !status) return;
     grid.replaceChildren();
 
     if (!upcomingShow.photos.length) {
-        empty.hidden = false;
         status.hidden = true;
         return;
     }
 
-    empty.hidden = true;
     status.hidden = false;
     status.textContent = `${upcomingShow.photos.length} photo${upcomingShow.photos.length === 1 ? "" : "s"} in this album. Click a photo to view it larger.`;
     upcomingShow.photos.forEach(filename => {
@@ -3350,16 +4199,119 @@ function renderConfiguredPhotos() {
     });
 }
 
-function openPhoto(src, filename) {
+function openPhoto(src, filename, downloadFilename = filename, showEventDetails = false) {
     document.getElementById("lightboxImage").src = src;
     document.getElementById("lightboxImage").alt = filename;
     document.getElementById("lightboxCaption").textContent = filename;
-    document.getElementById("photoLightbox").showModal();
+    const download = document.getElementById("lightboxDownload");
+    download.href = src;
+    download.download = downloadFilename;
+    document.getElementById("lightboxEventDetails").hidden = !showEventDetails;
+    document.getElementById("lightboxDownloadStatus").textContent = "";
+    const lightbox = document.getElementById("photoLightbox");
+    lightbox.classList.remove("is-closing", "is-opening");
+    lightbox.showModal();
+    lightbox.classList.add("is-opening");
+}
+
+let navigateToEventAfterPhotoClose = false;
+
+function openEventDetailsFromLightbox() {
+    navigateToEventAfterPhotoClose = true;
+    closePhoto();
 }
 
 function closePhoto() {
-    document.getElementById("photoLightbox").close();
+    const lightbox = document.getElementById("photoLightbox");
+    if (!lightbox.open || lightbox.classList.contains("is-closing")) return;
+    lightbox.classList.remove("is-opening");
+    lightbox.classList.add("is-closing");
+    window.setTimeout(() => {
+        if (lightbox.open && lightbox.classList.contains("is-closing")) {
+            lightbox.close();
+        }
+    }, 240);
 }
+
+document.getElementById("photoLightbox").addEventListener("animationend", event => {
+    const lightbox = event.currentTarget;
+    if (event.target !== lightbox) return;
+    if (event.animationName === "photoLightboxEnter") {
+        lightbox.classList.remove("is-opening");
+    } else if (event.animationName === "photoLightboxExit" && lightbox.open) {
+        lightbox.close();
+    }
+});
+
+document.getElementById("photoLightbox").addEventListener("close", event => {
+    event.currentTarget.classList.remove("is-opening", "is-closing");
+    if (navigateToEventAfterPhotoClose) {
+        navigateToEventAfterPhotoClose = false;
+        openPage("event-detail");
+    }
+});
+
+document.getElementById("photoLightbox").addEventListener("cancel", event => {
+    event.preventDefault();
+    closePhoto();
+});
+
+async function downloadPhoto(event) {
+    const link = event.currentTarget;
+    const status = document.getElementById("lightboxDownloadStatus");
+    const label = link.textContent;
+
+    // A file:// page cannot fetch sibling files as blobs. Leave the trusted
+    // user click alone so the browser can handle the anchor's download action.
+    if (location.protocol === "file:") {
+        status.textContent = "Requesting download from the local file…";
+        return;
+    }
+
+    event.preventDefault();
+    link.setAttribute("aria-busy", "true");
+    link.textContent = "Preparing download…";
+    status.textContent = "";
+
+    try {
+        const response = await fetch(link.href);
+        if (!response.ok) throw new Error(`Image request failed (${response.status})`);
+        const imageBlob = await response.blob();
+        const objectUrl = URL.createObjectURL(imageBlob);
+        const downloadLink = document.createElement("a");
+        downloadLink.href = objectUrl;
+        downloadLink.download = link.download || "image";
+        document.body.append(downloadLink);
+        downloadLink.click();
+        downloadLink.remove();
+        window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+        status.textContent = "Download started.";
+    } catch (error) {
+        console.error("Could not prepare image download:", error);
+        status.textContent = "The image could not be downloaded. Try again from the hosted page.";
+    } finally {
+        link.removeAttribute("aria-busy");
+        link.textContent = label;
+    }
+}
+
+document.addEventListener("click", event => {
+    const image = event.target instanceof Element ? event.target.closest("img") : null;
+    if (!image || image.closest("#photoLightbox")) return;
+
+    const source = image.currentSrc || image.getAttribute("src");
+    if (!source) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    let filename = "image";
+    try {
+        filename = decodeURIComponent(new URL(source, location.href).pathname.split("/").pop()) || filename;
+    } catch {
+        filename = image.alt || filename;
+    }
+    openPhoto(source, image.alt || filename, filename, Boolean(image.closest(".event-preview")));
+}, true);
 
 
 /* ==========================================================
@@ -3391,8 +4343,40 @@ let currentTheme =
 let particles = [];
 let fireworks = [];
 let fireworkSparks = [];
+let environmentParticles = [];
 let santaFlybyTimer = null;
+let witchFlybyTimer = null;
 let presentDropTimer = null;
+let weatherRefreshTimer = null;
+let weatherRequestPromise = null;
+let weatherObservationUpdatedAt = 0;
+let environmentStateRefreshTimer = null;
+let lightningTimer = null;
+let currentLightningTimer = null;
+let lastLightningShape = 0;
+
+const WINDER_TIME_ZONE = "America/New_York";
+const WEATHER_CACHE_KEY = "bcc-winder-weather-v1";
+const WEATHER_REFRESH_MS = 12 * 60 * 1000;
+const WEATHER_DISPLAY_MAX_AGE_MS = 3 * 60 * 60 * 1000;
+const environmentOverrides = { season: "auto", timeOfDay: "auto", weather: "live", windSpeedMph: null, windDirection: null };
+let weatherObservation = null;
+let environmentParticleSignature = "";
+let lastFrameTimestamp = 0;
+let animationFrameId = null;
+
+const environmentState = {
+    season: "default",
+    timeOfDay: "day",
+    weather: "unknown",
+    temperatureF: null,
+    windSpeedMph: 0,
+    windDirection: 0,
+    sunrise: null,
+    sunset: null,
+    isDay: true
+};
+let seasonalParticleViewportIsMobile = window.innerWidth < 768;
 
 
 let lastFirework = 0;
@@ -3407,6 +4391,9 @@ const canvasFrameInterval = 1000 / 30;
 
 
 function resizeCanvas() {
+    const mobileViewport = window.innerWidth < 768;
+    const crossedMobileBreakpoint = mobileViewport !== seasonalParticleViewportIsMobile;
+    seasonalParticleViewportIsMobile = mobileViewport;
 
     dpr =
         Math.min(
@@ -3448,6 +4435,13 @@ function resizeCanvas() {
         0
     );
 
+    environmentParticleSignature = "";
+    if (crossedMobileBreakpoint) {
+        resetParticles();
+    } else {
+        configureEnvironmentParticles();
+    }
+
 }
 
 
@@ -3468,13 +4462,17 @@ resizeCanvas();
 function resetParticles() {
 
     particles = [];
+    environmentParticles = [];
+    environmentParticleSignature = "";
 
     fireworks = [];
 
     fireworkSparks = [];
 
     lastFirework = performance.now();
-    nextFirework = 3500 + Math.random() * 2000;
+    nextFirework = currentTheme === "independence" && environmentState.timeOfDay === "night"
+        ? 1000 + Math.random() * 2000
+        : 8000 + Math.random() * 5000;
 
 
     let count = 0;
@@ -3485,28 +4483,28 @@ function resetParticles() {
         case "winter":
         case "christmas":
 
-            count = 95;
+            count = environmentState.weather === "snow" ? 116 : 70;
 
             break;
 
 
         case "valentine":
 
-            count = 24;
+            count = environmentState.timeOfDay === "night" ? 12 : 24;
 
             break;
 
 
         case "spring":
 
-            count = 45;
+            count = environmentState.timeOfDay === "night" ? 30 : 45;
 
             break;
 
 
         case "showers":
 
-            count = 120;
+            count = environmentState.timeOfDay === "night" ? 24 : 36;
 
             break;
 
@@ -3535,12 +4533,14 @@ function resetParticles() {
 
         case "halloween":
 
-            count = 16;
+            count = 10;
 
             break;
 
     }
 
+    if (window.innerWidth < 768) count = Math.ceil(count * .62);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) count = Math.ceil(count * .25);
 
     for (
         let i = 0;
@@ -3610,24 +4610,12 @@ function createParticle(initial = false) {
         phase:
             Math.random()
             * Math.PI
-            * 2
+            * 2,
+
+        leafColor:
+            Math.floor(Math.random() * 5)
 
     };
-
-
-    if (currentTheme === "showers") {
-
-        p.speed =
-            9
-            + Math.random()
-            * 8;
-
-        p.size =
-            8
-            + Math.random()
-            * 14;
-
-    }
 
 
     if (currentTheme === "summer") {
@@ -3639,8 +4627,136 @@ function createParticle(initial = false) {
 
     }
 
+    if (currentTheme === "spring" || currentTheme === "showers") {
+        p.color = Math.random() < .55 ? "#f5b9cc" : "#d8ef8b";
+    }
+
+    if (currentTheme === "halloween") {
+        p.color = Math.random() < .5 ? "#ff8b2c" : "#be72e8";
+    }
 
     return p;
+}
+
+function configureEnvironmentParticles() {
+    const signature = [
+        currentTheme,
+        environmentState.timeOfDay,
+        environmentState.weather,
+        Math.round(environmentState.windSpeedMph),
+        window.innerWidth < 768 ? "mobile" : "desktop",
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "reduced" : "motion"
+    ].join("|");
+    if (signature === environmentParticleSignature) return;
+    environmentParticleSignature = signature;
+    environmentParticles = [];
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const mobile = window.innerWidth < 768;
+    const totalParticleCap = mobile ? 80 : 150;
+    const addParticles = (type, count) => {
+        const desiredCount = mobile ? Math.ceil(count * .58) : count;
+        const availableCapacity = Math.max(0, totalParticleCap - particles.length - environmentParticles.length);
+        const limit = Math.min(desiredCount, availableCapacity);
+        for (let index = 0; index < limit; index++) {
+            const heavyRain = type === "rain"
+                && ["heavy-rain", "thunderstorm"].includes(environmentState.weather);
+            environmentParticles.push({
+                type,
+                x: Math.random() * width,
+                y: Math.random() * height,
+                size: type === "rain" ? 12 + Math.random() * 26 : 1 + Math.random() * 2.6,
+                speed: type === "rain"
+                    ? (heavyRain ? 650 : 480) + Math.random() * (heavyRain ? 700 : 560)
+                    : 25 + Math.random() * 70,
+                alpha: .18 + Math.random() * .48,
+                phase: Math.random() * Math.PI * 2,
+                depth: .45 + Math.random() * .75
+            });
+        }
+    };
+
+    if (["rain", "heavy-rain", "thunderstorm"].includes(environmentState.weather)) {
+        const density = environmentState.weather === "heavy-rain" || environmentState.weather === "thunderstorm" ? 140 : 86;
+        addParticles("rain", density);
+    } else if (environmentState.weather === "snow" && !["winter", "christmas"].includes(currentTheme)) {
+        addParticles("snow", 68);
+    }
+
+    if (["night", "sunset"].includes(environmentState.timeOfDay)
+        && ["clear", "partly-cloudy"].includes(environmentState.weather)) {
+        const sunsetScale = environmentState.timeOfDay === "sunset" ? .3 : 1;
+        addParticles("star", Math.ceil((environmentState.weather === "clear" ? 76 : 35) * sunsetScale));
+    }
+
+    environmentParticles.sort((a, b) => (a.depth || 0) - (b.depth || 0));
+}
+
+function getRainAngle() {
+    const windRadians = environmentState.windDirection * Math.PI / 180;
+    const windSpeed = Math.min(environmentState.windSpeedMph, 35);
+    return Math.max(-.28, Math.min(.28, -Math.sin(windRadians) * windSpeed / 180));
+}
+
+function updateEnvironmentParticles(time, deltaSeconds) {
+    const windRadians = environmentState.windDirection * Math.PI / 180;
+    const windDrift = -Math.sin(windRadians) * Math.min(environmentState.windSpeedMph, 35) * 1.45;
+    const rainAngle = getRainAngle();
+
+    for (const particle of environmentParticles) {
+        particle.phase += deltaSeconds;
+        if (particle.type === "rain") {
+            particle.y += particle.speed * deltaSeconds;
+            particle.x += rainAngle * particle.speed * deltaSeconds;
+            if (particle.y > height + particle.size) {
+                particle.y = -particle.size;
+                particle.x = Math.random() * width;
+            }
+            if (particle.x < -particle.size) particle.x = width + particle.size;
+        } else if (particle.type === "snow") {
+            particle.y += particle.speed * particle.depth * deltaSeconds;
+            particle.x += (windDrift * .35 + Math.sin(time * .0007 + particle.phase) * 9) * particle.depth * deltaSeconds;
+            if (particle.y > height + 8) {
+                particle.y = -8;
+                particle.x = Math.random() * width;
+            }
+        }
+    }
+}
+
+function drawEnvironmentParticles(time) {
+    const windAngle = getRainAngle();
+    for (const particle of environmentParticles) {
+        if (particle.type === "star") {
+            const twinkle = .28 + (Math.sin(time * .0012 + particle.phase) + 1) * .25;
+            const sunsetFade = environmentState.timeOfDay === "sunset" ? .35 : 1;
+            ctx.globalAlpha = twinkle * particle.alpha * sunsetFade;
+            ctx.fillStyle = "#e9f3ff";
+            ctx.shadowColor = "#b8d7ff";
+            ctx.shadowBlur = particle.size * 2.5;
+            ctx.beginPath();
+            ctx.arc(particle.x, particle.y, particle.size * .55, 0, Math.PI * 2);
+            ctx.fill();
+        } else if (particle.type === "snow") {
+            ctx.globalAlpha = particle.alpha * particle.depth;
+            ctx.fillStyle = "#edf8ff";
+            ctx.shadowColor = "#d8edff";
+            ctx.shadowBlur = 7;
+            ctx.beginPath();
+            ctx.arc(particle.x, particle.y, particle.size * particle.depth, 0, Math.PI * 2);
+            ctx.fill();
+        } else if (particle.type === "rain") {
+            ctx.globalAlpha = particle.alpha * particle.depth;
+            ctx.strokeStyle = particle.depth > 1 ? "rgba(168,215,255,.54)" : "rgba(135,185,228,.32)";
+            ctx.lineWidth = particle.depth > 1 ? 1.25 : .8;
+            ctx.beginPath();
+            ctx.moveTo(particle.x, particle.y);
+            ctx.lineTo(particle.x + windAngle * particle.size, particle.y + particle.size);
+            ctx.stroke();
+        }
+    }
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
 }
 
 
@@ -3648,7 +4764,8 @@ function createParticle(initial = false) {
    NORMAL PARTICLES
    ========================================================= */
 
-function updateParticles(time) {
+function updateParticles(time, frameScale) {
+    const windBias = -Math.sin(environmentState.windDirection * Math.PI / 180) * Math.min(environmentState.windSpeedMph, 35) * .02;
 
     for (const p of particles) {
 
@@ -3661,14 +4778,15 @@ function updateParticles(time) {
             currentTheme === "christmas"
         ) {
 
-            p.y += p.speed;
+            p.y += p.speed * frameScale;
 
-            p.x +=
-                Math.sin(
+            p.x += (
+                windBias + Math.sin(
                     time * .001
                     + p.phase
                 )
-                * .35;
+                * .35
+            ) * frameScale;
 
             if (
                 p.y >
@@ -3692,14 +4810,14 @@ function updateParticles(time) {
         ) {
 
             p.y -=
-                p.speed * .45;
+                p.speed * .45 * frameScale;
 
             p.x +=
                 Math.sin(
                     time * .001
                     + p.phase
                 )
-                * .35;
+                * .35 * frameScale;
 
             if (p.y < -30) {
 
@@ -3719,49 +4837,24 @@ function updateParticles(time) {
 
         else if (
             currentTheme === "spring"
+            || currentTheme === "showers"
         ) {
 
             p.y +=
-                p.speed * .7;
+                p.speed * .7 * frameScale;
 
-            p.x +=
-                p.drift
+            p.x += (
+                p.drift + windBias
                 +
                 Math.sin(
                     time * .001
                     + p.phase
                 )
-                * .6;
+                * .6
+            ) * frameScale;
 
             p.rotation +=
-                p.spin;
-
-            if (
-                p.y >
-                height + 30
-            ) {
-
-                Object.assign(
-                    p,
-                    createParticle(false)
-                );
-
-            }
-
-        }
-
-
-        /* APRIL RAIN */
-
-        else if (
-            currentTheme === "showers"
-        ) {
-
-            p.y +=
-                p.speed;
-
-            p.x -=
-                p.speed * .12;
+                p.spin * frameScale;
 
             if (
                 p.y >
@@ -3786,14 +4879,15 @@ function updateParticles(time) {
         ) {
 
             p.y +=
-                p.speed * .3;
+                p.speed * .3 * frameScale;
 
-            p.x +=
-                Math.sin(
+            p.x += (
+                windBias * .5 + Math.sin(
                     time * .0008
                     + p.phase
                 )
-                * .35;
+                * .35
+            ) * frameScale;
 
             if (
                 p.y >
@@ -3821,14 +4915,14 @@ function updateParticles(time) {
                     time * .001
                     + p.phase
                 )
-                * .2;
+                * .2 * frameScale;
 
             p.y +=
                 Math.cos(
                     time * .0013
                     + p.phase
                 )
-                * .15;
+                * .15 * frameScale;
 
         }
 
@@ -3843,17 +4937,18 @@ function updateParticles(time) {
         ) {
 
             p.y +=
-                p.speed;
+                p.speed * frameScale;
 
-            p.x +=
-                Math.sin(
+            p.x += (
+                p.drift + windBias + Math.sin(
                     time * .001
                     + p.phase
                 )
-                * 1.1;
+                * 1.1
+            ) * frameScale;
 
             p.rotation +=
-                p.spin;
+                p.spin * frameScale;
 
             if (
                 p.y >
@@ -3870,35 +4965,18 @@ function updateParticles(time) {
         }
 
 
-        /* HALLOWEEN BATS */
+        /* HALLOWEEN EMBERS */
 
         else if (
             currentTheme ===
             "halloween"
         ) {
 
-            p.x +=
-                p.speed * 1.1;
-
-            p.y +=
-                Math.sin(
-                    time * .003
-                    + p.phase
-                )
-                * .35;
-
-            if (
-                p.x >
-                width + 50
-            ) {
-
-                p.x = -50;
-
-                p.y =
-                    Math.random()
-                    * height
-                    * .55;
-
+            p.y -= p.speed * .45 * frameScale;
+            p.x += (p.drift + Math.sin(time * .001 + p.phase) * .45) * frameScale;
+            if (p.y < -20) {
+                Object.assign(p, createParticle(false));
+                p.y = height + 20;
             }
 
         }
@@ -4042,8 +5120,8 @@ function drawParticles(time) {
         /* SPRING PETALS */
 
         else if (
-            currentTheme ===
-            "spring"
+            currentTheme === "spring"
+            || currentTheme === "showers"
         ) {
 
             ctx.translate(
@@ -4067,41 +5145,9 @@ function drawParticles(time) {
                 Math.PI * 2
             );
 
-            ctx.fillStyle =
-                Math.random() > .5
-                    ? "#ff9cba"
-                    : "#f8c6d7";
+            ctx.fillStyle = p.color;
 
             ctx.fill();
-
-        }
-
-
-        /* RAIN */
-
-        else if (
-            currentTheme ===
-            "showers"
-        ) {
-
-            ctx.beginPath();
-
-            ctx.moveTo(
-                p.x,
-                p.y
-            );
-
-            ctx.lineTo(
-                p.x - 4,
-                p.y + p.size
-            );
-
-            ctx.strokeStyle =
-                "rgba(130,205,255,.38)";
-
-            ctx.lineWidth = 1;
-
-            ctx.stroke();
 
         }
 
@@ -4144,14 +5190,16 @@ function drawParticles(time) {
             "summer"
         ) {
 
-            const glow =
+            const nightGlow = environmentState.timeOfDay === "night" ? 1.35 : 1;
+            const glow = nightGlow * (
                 .35
                 +
                 Math.sin(
                     time * .003
                     + p.phase
                 )
-                * .3;
+                * .3
+            );
 
 
             ctx.globalAlpha =
@@ -4178,7 +5226,7 @@ function drawParticles(time) {
                 "#ffd85c";
 
             ctx.shadowBlur =
-                16;
+                environmentState.timeOfDay === "night" ? 22 : 16;
 
             ctx.fill();
 
@@ -4228,10 +5276,7 @@ function drawParticles(time) {
 
             ctx.fillStyle =
                 leafColors[
-                    Math.floor(
-                        p.phase
-                        % leafColors.length
-                    )
+                    p.leafColor % leafColors.length
                 ];
 
 
@@ -4240,60 +5285,21 @@ function drawParticles(time) {
         }
 
 
-        /* BATS */
+        /* HALLOWEEN EMBERS */
 
         else if (
             currentTheme ===
             "halloween"
         ) {
 
-            const flap =
-                Math.sin(
-                    time * .01
-                    + p.phase
-                )
-                * p.size;
-
-
-            ctx.strokeStyle =
-                "rgba(12,5,17,.80)";
-
-            ctx.lineWidth =
-                Math.max(
-                    2,
-                    p.size * .25
-                );
-
-
+            const emberGlow = .28 + (Math.sin(time * .002 + p.phase) + 1) * .26;
+            ctx.globalAlpha = p.alpha * emberGlow;
+            ctx.fillStyle = p.color;
+            ctx.shadowColor = p.color;
+            ctx.shadowBlur = 10;
             ctx.beginPath();
-
-            ctx.moveTo(
-                p.x,
-                p.y
-            );
-
-            ctx.quadraticCurveTo(
-                p.x - p.size,
-                p.y - flap,
-                p.x - p.size * 2,
-                p.y
-            );
-
-
-            ctx.moveTo(
-                p.x,
-                p.y
-            );
-
-            ctx.quadraticCurveTo(
-                p.x + p.size,
-                p.y - flap,
-                p.x + p.size * 2,
-                p.y
-            );
-
-
-            ctx.stroke();
+            ctx.arc(p.x, p.y, Math.max(1.2, p.size * .32), 0, Math.PI * 2);
+            ctx.fill();
 
         }
 
@@ -4324,6 +5330,8 @@ const fireworkColors = [
 
 
 function launchFirework() {
+
+    if (document.hidden || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     fireworks.push({
 
@@ -4385,16 +5393,11 @@ function explodeFirework(
     color
 ) {
 
-    const count =
-        Math.min(
-            26
-            +
-            Math.floor(
-                Math.random()
-                * 15
-            ),
-            100 - fireworkSparks.length
-        );
+    const nightSparkCount = environmentState.timeOfDay === "night";
+    const count = Math.min(
+        (nightSparkCount ? 26 : 12) + Math.floor(Math.random() * (nightSparkCount ? 15 : 10)),
+        100 - fireworkSparks.length
+    );
 
     if (count <= 0) return;
 
@@ -4459,7 +5462,7 @@ function explodeFirework(
    UPDATE FIREWORKS
    ========================================================= */
 
-function updateFireworks(time) {
+function updateFireworks(time, frameScale) {
 
     if (
         currentTheme !==
@@ -4468,6 +5471,12 @@ function updateFireworks(time) {
 
         return;
 
+    }
+
+    if (["heavy-rain", "thunderstorm"].includes(environmentState.weather)) {
+        fireworks = [];
+        fireworkSparks = [];
+        return;
     }
 
 
@@ -4485,11 +5494,9 @@ function updateFireworks(time) {
             time;
 
 
-        nextFirework =
-            3500
-            +
-            Math.random()
-            * 2500;
+        nextFirework = environmentState.timeOfDay === "night"
+            ? 1000 + Math.random() * 2000
+            : 8000 + Math.random() * 5000;
 
     }
 
@@ -4511,11 +5518,11 @@ function updateFireworks(time) {
         f.oldY = f.y;
 
 
-        f.x += f.vx;
-        f.y += f.vy;
+        f.x += f.vx * frameScale;
+        f.y += f.vy * frameScale;
 
 
-        f.vy += .035;
+        f.vy += .035 * frameScale;
 
 
         if (
@@ -4562,22 +5569,22 @@ function updateFireworks(time) {
 
 
         p.x +=
-            p.vx;
+            p.vx * frameScale;
 
         p.y +=
-            p.vy;
+            p.vy * frameScale;
 
 
         p.vx *=
-            .985;
+            Math.pow(.985, frameScale);
 
         p.vy =
-            p.vy * .985
-            + .035;
+            p.vy * Math.pow(.985, frameScale)
+            + .035 * frameScale;
 
 
         p.alpha -=
-            p.decay;
+            p.decay * frameScale;
 
 
         if (
@@ -4710,14 +5717,18 @@ function drawFireworks() {
    ========================================================= */
 
 function animate(time) {
+    animationFrameId = null;
+    if (document.hidden || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (time - lastCanvasFrame < canvasFrameInterval) {
+        animationFrameId = requestAnimationFrame(animate);
+        return;
+    }
 
-    requestAnimationFrame(
-        animate
-    );
-
-    if (document.hidden) return;
-
-    if (time - lastCanvasFrame < canvasFrameInterval) return;
+    const deltaSeconds = lastFrameTimestamp
+        ? Math.min((time - lastFrameTimestamp) / 1000, .08)
+        : 1 / 30;
+    const frameScale = deltaSeconds * 30;
+    lastFrameTimestamp = time;
     lastCanvasFrame = time;
 
 
@@ -4730,23 +5741,124 @@ function animate(time) {
 
 
     updateParticles(
-        time
+        time,
+        frameScale
     );
+
+    updateEnvironmentParticles(time, deltaSeconds);
 
 
     drawParticles(
         time
     );
 
+    drawEnvironmentParticles(time);
+
 
     updateFireworks(
-        time
+        time,
+        frameScale
     );
 
 
     drawFireworks();
 
+    if (!document.hidden && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        animationFrameId = requestAnimationFrame(animate);
+    }
+
 }
+
+function startAnimationLoop() {
+    if (document.hidden) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        drawReducedMotionEnvironment();
+        return;
+    }
+    if (animationFrameId !== null) return;
+    lastFrameTimestamp = 0;
+    animationFrameId = requestAnimationFrame(animate);
+}
+
+function drawReducedMotionEnvironment() {
+    ctx.clearRect(0, 0, width, height);
+    const time = performance.now();
+    drawParticles(time);
+    drawEnvironmentParticles(time);
+    drawFireworks();
+}
+
+function stopAnimationLoop() {
+    if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);
+    animationFrameId = null;
+    lastFrameTimestamp = 0;
+}
+
+document.addEventListener("visibilitychange", () => {
+    document.body.classList.toggle("page-hidden", document.hidden);
+    if (document.hidden) {
+        stopAnimationLoop();
+        clearTimeout(weatherRefreshTimer);
+        weatherRefreshTimer = null;
+        clearTimeout(environmentStateRefreshTimer);
+        environmentStateRefreshTimer = null;
+        clearTimeout(lightningTimer);
+        lightningTimer = null;
+        clearTimeout(santaFlybyTimer);
+        clearTimeout(witchFlybyTimer);
+        clearTimeout(presentDropTimer);
+        santaFlybyTimer = null;
+        witchFlybyTimer = null;
+        presentDropTimer = null;
+        document.getElementById("santaFlyby").classList.remove("is-flying");
+        document.getElementById("witchFlyby").classList.remove("is-flying");
+    } else {
+        startAnimationLoop();
+        startEnvironmentStateRefresh();
+        if (Date.now() - weatherObservationUpdatedAt >= WEATHER_REFRESH_MS) void fetchWinderWeather();
+        startWeatherPolling();
+        updateLightningSchedule();
+        if (currentTheme === "christmas") {
+            scheduleSantaFlyby(5000 + Math.random() * 9000);
+            schedulePresentDrop(5000 + Math.random() * 7000);
+        } else if (currentTheme === "halloween") {
+            scheduleWitchFlyby(5000 + Math.random() * 9000);
+        }
+    }
+});
+
+const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+const onMotionPreferenceChange = event => {
+    if (event.matches) {
+        stopAnimationLoop();
+        clearTimeout(lightningTimer);
+        lightningTimer = null;
+        clearTimeout(santaFlybyTimer);
+        clearTimeout(witchFlybyTimer);
+        clearTimeout(presentDropTimer);
+        document.getElementById("santaFlyby").classList.remove("is-flying");
+        document.getElementById("witchFlyby").classList.remove("is-flying");
+        document.getElementById("giftDropLayer").replaceChildren();
+        document.body.classList.remove("lightning-flash");
+        resetParticles();
+        environmentParticles = [];
+        environmentParticleSignature = "";
+        drawReducedMotionEnvironment();
+    } else {
+        resetParticles();
+        configureEnvironmentParticles();
+        startAnimationLoop();
+        updateLightningSchedule();
+        if (currentTheme === "christmas") {
+            scheduleSantaFlyby(5000 + Math.random() * 9000);
+            schedulePresentDrop(5000 + Math.random() * 7000);
+        } else if (currentTheme === "halloween") {
+            scheduleWitchFlyby(5000 + Math.random() * 9000);
+        }
+    }
+};
+if (motionPreference.addEventListener) motionPreference.addEventListener("change", onMotionPreferenceChange);
+else motionPreference.addListener(onMotionPreferenceChange);
 
 
 /* =========================================================
@@ -4755,8 +5867,7 @@ function animate(time) {
 
 
 function getSeasonalTheme(date = new Date()) {
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
+    const { month, day } = getWinderParts(date);
 
     if (month === 1) return "winter";
     if (month === 2) return day <= 14 ? "valentine" : "default";
@@ -4779,25 +5890,529 @@ const seasonalClasses = [
     "theme-halloween", "theme-thanksgiving", "theme-christmas"
 ];
 
-function setTheme(theme) {
+const weatherClasses = [
+    "weather-clear", "weather-partly-cloudy", "weather-overcast", "weather-rain",
+    "weather-heavy-rain", "weather-thunderstorm", "weather-snow", "weather-fog",
+    "weather-unknown"
+];
+
+function getWinderParts(date = new Date()) {
+    try {
+        const parts = new Intl.DateTimeFormat("en-US", {
+            timeZone: WINDER_TIME_ZONE,
+            year: "numeric", month: "numeric", day: "numeric",
+            hour: "numeric", minute: "numeric", hourCycle: "h23"
+        }).formatToParts(date);
+        return Object.fromEntries(parts.filter(part => part.type !== "literal").map(part => [part.type, Number(part.value)]));
+    } catch {
+        return {
+            year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate(),
+            hour: date.getHours(), minute: date.getMinutes()
+        };
+    }
+}
+
+function getWinderDateKey(date = new Date()) {
+    const parts = getWinderParts(date);
+    return `${parts.year}-${String(parts.month).padStart(2, "0")}-${String(parts.day).padStart(2, "0")}`;
+}
+
+function zonedLocalTimeToDate(value) {
+    if (!value) return null;
+    const [datePart, timePart] = value.split("T");
+    if (!datePart || !timePart) return null;
+    const [year, month, day] = datePart.split("-").map(Number);
+    const [hour, minute, second = 0] = timePart.split(":").map(Number);
+    const desired = Date.UTC(year, month - 1, day, hour, minute, second);
+    let guess = desired;
+
+    for (let attempt = 0; attempt < 3; attempt++) {
+        const parts = new Intl.DateTimeFormat("en-US", {
+            timeZone: WINDER_TIME_ZONE,
+            year: "numeric", month: "numeric", day: "numeric",
+            hour: "numeric", minute: "numeric", second: "numeric", hourCycle: "h23"
+        }).formatToParts(new Date(guess));
+        const localParts = Object.fromEntries(parts.filter(part => part.type !== "literal").map(part => [part.type, Number(part.value)]));
+        const renderedAsUtc = Date.UTC(localParts.year, localParts.month - 1, localParts.day, localParts.hour, localParts.minute, localParts.second);
+        guess += desired - renderedAsUtc;
+    }
+
+    return new Date(guess);
+}
+
+// Approximate Winder sunrise/sunset from NOAA's fractional-year solar equations
+// when the weather response does not include daily solar times.
+function getApproximateWinderSunTimes(date = new Date()) {
+    const { year, month, day } = getWinderParts(date);
+    const firstDayUtc = Date.UTC(year, 0, 1);
+    const dateUtc = Date.UTC(year, month - 1, day);
+    const dayOfYear = Math.floor((dateUtc - firstDayUtc) / 86400000) + 1;
+    const daysInYear = (Date.UTC(year + 1, 0, 1) - firstDayUtc) / 86400000;
+    const gamma = 2 * Math.PI / daysInYear * (dayOfYear - 1);
+    const equationOfTime = 229.18 * (
+        .000075
+        + .001868 * Math.cos(gamma)
+        - .032077 * Math.sin(gamma)
+        - .014615 * Math.cos(2 * gamma)
+        - .040849 * Math.sin(2 * gamma)
+    );
+    const declination = .006918
+        - .399912 * Math.cos(gamma)
+        + .070257 * Math.sin(gamma)
+        - .006758 * Math.cos(2 * gamma)
+        + .000907 * Math.sin(2 * gamma)
+        - .002697 * Math.cos(3 * gamma)
+        + .00148 * Math.sin(3 * gamma);
+    const latitude = 33.9926 * Math.PI / 180;
+    const zenith = 90.833 * Math.PI / 180;
+    const cosHourAngle = (
+        Math.cos(zenith) - Math.sin(latitude) * Math.sin(declination)
+    ) / (Math.cos(latitude) * Math.cos(declination));
+    if (!Number.isFinite(cosHourAngle) || Math.abs(cosHourAngle) > 1) return null;
+
+    const hourAngle = Math.acos(cosHourAngle) * 180 / Math.PI;
+    const longitude = -83.7202;
+    const utcMidnight = Date.UTC(year, month - 1, day);
+    const sunriseUtcMinutes = 720 - 4 * (longitude + hourAngle) - equationOfTime;
+    const sunsetUtcMinutes = 720 - 4 * (longitude - hourAngle) - equationOfTime;
+
+    return {
+        sunrise: new Date(utcMidnight + sunriseUtcMinutes * 60000),
+        sunset: new Date(utcMidnight + sunsetUtcMinutes * 60000)
+    };
+}
+
+function getWeatherCategory(code, rainAmount = 0, snowfall = 0) {
+    if (snowfall > 0 || [71, 73, 75, 77, 85, 86].includes(code)) return "snow";
+    if ([95, 96, 99].includes(code)) return "thunderstorm";
+    if ([65, 67, 82].includes(code) || rainAmount >= 7) return "heavy-rain";
+    if ([51, 53, 55, 56, 57, 61, 63, 66, 80, 81].includes(code) || rainAmount > 0) return "rain";
+    if ([45, 48].includes(code)) return "fog";
+    if (code === 0) return "clear";
+    if ([1, 2].includes(code)) return "partly-cloudy";
+    if (code === 3) return "overcast";
+    return "unknown";
+}
+
+function weatherDescription(category) {
+    const labels = {
+        clear: ["☀️", "Clear"],
+        "partly-cloudy": ["🌤️", "Partly cloudy"],
+        overcast: ["☁️", "Cloudy"],
+        rain: ["🌧️", "Rain"],
+        "heavy-rain": ["🌧️", "Heavy rain"],
+        thunderstorm: ["⛈️", "Thunderstorm"],
+        snow: ["❄️", "Snow"],
+        fog: ["🌫️", "Fog"],
+        unknown: ["", "Weather unavailable"]
+    };
+    return labels[category] || labels.unknown;
+}
+
+function getActiveEnvironmentEffects() {
+    const effects = [];
+    if (["winter", "christmas"].includes(environmentState.season)) effects.push("Seasonal snow");
+    if (["spring", "showers", "late-spring"].includes(environmentState.season)) effects.push("Spring pollen and petals");
+    if (environmentState.season === "summer") effects.push("Fireflies");
+    if (["fall", "thanksgiving"].includes(environmentState.season)) effects.push("Falling leaves");
+    if (environmentState.season === "halloween") effects.push("Halloween bats, fog, embers, witch flyby");
+    if (environmentState.season === "christmas") effects.push("Christmas lights, Santa flyby, interactive presents");
+    if (["night", "sunset"].includes(environmentState.timeOfDay) && ["clear", "partly-cloudy"].includes(environmentState.weather)) effects.push("Twinkling stars");
+    if (["rain", "heavy-rain", "thunderstorm"].includes(environmentState.weather)) effects.push("Live rain");
+    if (environmentState.weather === "snow") effects.push("Live snow");
+    if (environmentState.weather === "fog") effects.push("Weather fog");
+    if (environmentState.weather === "thunderstorm") effects.push("Occasional lightning");
+    if (environmentState.season === "independence") effects.push("Fireworks (nighttime intensified; storms suppressed)");
+    return effects.length ? effects : ["Seasonal atmosphere"];
+}
+
+function getAutomaticTimeOfDay() {
+    const now = Date.now();
+    const todayKey = getWinderDateKey();
+    const daily = weatherObservation?.daily;
+    const dateIndex = daily?.time?.indexOf(todayKey) ?? -1;
+    if (dateIndex >= 0) {
+        const sunrise = zonedLocalTimeToDate(daily.sunrise?.[dateIndex])?.getTime();
+        const sunset = zonedLocalTimeToDate(daily.sunset?.[dateIndex])?.getTime();
+        if (Number.isFinite(sunrise) && Number.isFinite(sunset)) {
+            if (now >= sunset - 35 * 60 * 1000 && now <= sunset + 20 * 60 * 1000) return "sunset";
+            return now >= sunrise && now < sunset ? "day" : "night";
+        }
+    }
+
+    const approximateSolarTimes = getApproximateWinderSunTimes(new Date(now));
+    if (approximateSolarTimes) {
+        if (now >= approximateSolarTimes.sunset.getTime() - 35 * 60 * 1000
+            && now <= approximateSolarTimes.sunset.getTime() + 20 * 60 * 1000) {
+            return "sunset";
+        }
+        return now >= approximateSolarTimes.sunrise.getTime()
+            && now < approximateSolarTimes.sunset.getTime()
+            ? "day"
+            : "night";
+    }
+
+    if (isWeatherObservationFresh() && Number.isFinite(weatherObservation?.current?.is_day)) {
+        return weatherObservation.current.is_day === 1 ? "day" : "night";
+    }
+
+    const { hour, minute } = getWinderParts();
+    const localMinutes = hour * 60 + minute;
+    if (localMinutes >= 17 * 60 + 30 && localMinutes < 19 * 60 + 30) return "sunset";
+    return localMinutes >= 7 * 60 && localMinutes < 19 * 60 ? "day" : "night";
+}
+
+function isWeatherObservationFresh(now = Date.now()) {
+    const age = now - weatherObservationUpdatedAt;
+    return Boolean(weatherObservation) && age >= 0 && age < WEATHER_DISPLAY_MAX_AGE_MS;
+}
+
+function renderWeatherIndicator() {
+    const category = environmentState.weather;
+    const [icon, label] = weatherDescription(category);
+    const temperature = environmentState.temperatureF;
+    document.getElementById("weatherTemperature").textContent = Number.isFinite(temperature)
+        ? `${Math.round(temperature)}°F`
+        : "";
+    document.querySelector(".weather-summary-full").textContent = `${icon ? `${icon} ` : ""}${label}`;
+    document.querySelector(".weather-summary-short").textContent = icon;
+    document.getElementById("weatherIndicator").setAttribute("aria-label", `Winder, Georgia weather: ${label}${Number.isFinite(temperature) ? `, ${Math.round(temperature)} degrees Fahrenheit` : ""}`);
+}
+
+function applyEnvironmentState() {
+    const automaticSeason = getSeasonalTheme();
+    const selectedSeason = environmentOverrides.season === "auto" ? automaticSeason : environmentOverrides.season;
+    const themeChanged = selectedSeason !== currentTheme;
+    if (themeChanged) setTheme(selectedSeason, true);
+
+    const observationIsFresh = isWeatherObservationFresh();
+    const currentObservation = observationIsFresh ? weatherObservation : null;
+    const weather = environmentOverrides.weather === "live"
+        ? (currentObservation?.category || "unknown")
+        : environmentOverrides.weather;
+    const timeOfDay = environmentOverrides.timeOfDay === "auto"
+        ? getAutomaticTimeOfDay()
+        : environmentOverrides.timeOfDay;
+    const previousWeather = environmentState.weather;
+    const previousTimeOfDay = environmentState.timeOfDay;
+
+    document.body.classList.remove(...weatherClasses, "time-day", "time-sunset", "time-night");
+    document.body.classList.add(`weather-${weather}`, `time-${timeOfDay}`);
+    document.body.dataset.weather = weather;
+    document.body.dataset.timeOfDay = timeOfDay;
+
+    const current = currentObservation?.current || {};
+    environmentState.season = currentTheme;
+    environmentState.timeOfDay = timeOfDay;
+    environmentState.weather = weather;
+    environmentState.temperatureF = Number.isFinite(current.temperature_2m)
+        ? current.temperature_2m * 9 / 5 + 32
+        : null;
+    environmentState.windSpeedMph = Number.isFinite(environmentOverrides.windSpeedMph)
+        ? environmentOverrides.windSpeedMph
+        : (Number.isFinite(current.wind_speed_10m) ? current.wind_speed_10m * .621371 : 0);
+    environmentState.windDirection = Number.isFinite(environmentOverrides.windDirection)
+        ? environmentOverrides.windDirection
+        : (Number.isFinite(current.wind_direction_10m) ? current.wind_direction_10m : 0);
+    const todayIndex = weatherObservation?.daily?.time?.indexOf(getWinderDateKey()) ?? -1;
+    environmentState.sunrise = todayIndex >= 0 ? weatherObservation.daily.sunrise?.[todayIndex] || null : null;
+    environmentState.sunset = todayIndex >= 0 ? weatherObservation.daily.sunset?.[todayIndex] || null : null;
+    environmentState.isDay = timeOfDay === "day" || timeOfDay === "sunset";
+
+    if (previousTimeOfDay !== timeOfDay && currentTheme === "independence") {
+        lastFirework = performance.now();
+        nextFirework = timeOfDay === "night"
+            ? 1000 + Math.random() * 2000
+            : 8000 + Math.random() * 5000;
+    }
+
+    const seasonalParticleStateChanged = previousTimeOfDay !== timeOfDay
+        && ["valentine", "spring", "showers"].includes(currentTheme);
+    const snowParticleStateChanged = previousWeather !== weather
+        && ["winter", "christmas"].includes(currentTheme);
+    if (themeChanged || seasonalParticleStateChanged || snowParticleStateChanged) {
+        resetParticles();
+    }
+
+    renderWeatherIndicator();
+    configureEnvironmentParticles();
+    updateLightningSchedule();
+    updateEnvironmentDevStatus();
+
+    const signature = [currentTheme, timeOfDay, weather, Math.round(environmentState.temperatureF || 0), Math.round(environmentState.windSpeedMph), Math.round(environmentState.windDirection)].join("|");
+    if (signature !== lastEnvironmentLog) {
+        lastEnvironmentLog = signature;
+        console.info("[BCC Environment] State changed", {
+            season: environmentState.season,
+            time: environmentState.timeOfDay,
+            weather: environmentState.weather,
+            temperatureF: environmentState.temperatureF,
+            windMph: Math.round(environmentState.windSpeedMph),
+            effects: getActiveEnvironmentEffects()
+        });
+    }
+}
+
+let lastEnvironmentLog = "";
+
+function updateEnvironmentDevStatus() {
+    const status = document.getElementById("environmentDevStatus");
+    if (!status) return;
+    const temperature = Number.isFinite(environmentState.temperatureF) ? ` · ${Math.round(environmentState.temperatureF)}°F` : "";
+    const wind = environmentState.windSpeedMph ? ` · wind ${Math.round(environmentState.windSpeedMph)} mph` : "";
+    status.textContent = `${environmentState.season} · ${environmentState.timeOfDay} · ${environmentState.weather}${temperature}${wind}`;
+    syncEnvironmentDevControls();
+}
+
+function syncEnvironmentDevControls() {
+    const season = document.getElementById("devSeason");
+    if (!season) return;
+    season.value = environmentOverrides.season;
+    document.getElementById("devTime").value = environmentOverrides.timeOfDay;
+    document.getElementById("devWeather").value = environmentOverrides.weather;
+
+    const slider = document.getElementById("devWindSpeed");
+    const manualWindSpeed = Number.isFinite(environmentOverrides.windSpeedMph);
+    const shownSpeed = manualWindSpeed ? environmentOverrides.windSpeedMph : environmentState.windSpeedMph;
+    slider.value = String(Math.max(0, Math.min(35, Math.round(shownSpeed || 0))));
+    document.getElementById("devWindSpeedValue").textContent = manualWindSpeed
+        ? `${Math.round(shownSpeed)} mph`
+        : `Live · ${Math.round(shownSpeed || 0)} mph`;
+    document.getElementById("devWindDirection").value = Number.isFinite(environmentOverrides.windDirection)
+        ? String(environmentOverrides.windDirection)
+        : "live";
+}
+
+function applyDeveloperTestPreset(name) {
+    const presets = {
+        "rainy-day": { season: "summer", timeOfDay: "day", weather: "rain", windSpeedMph: 12, windDirection: 270 },
+        "rainy-night": { season: "default", timeOfDay: "night", weather: "rain", windSpeedMph: 18, windDirection: 270 },
+        "halloween-rain": { season: "halloween", timeOfDay: "night", weather: "rain", windSpeedMph: 12, windDirection: 270 },
+        "christmas-snow": { season: "christmas", timeOfDay: "night", weather: "snow", windSpeedMph: 8, windDirection: 270 },
+        "independence-night": { season: "independence", timeOfDay: "night", weather: "clear", windSpeedMph: 0, windDirection: 270 },
+        "fall-wind": { season: "fall", timeOfDay: "day", weather: "clear", windSpeedMph: 30, windDirection: 270 }
+    };
+    const preset = presets[name];
+    if (!preset) return;
+    Object.assign(environmentOverrides, preset);
+    syncEnvironmentDevControls();
+    applyEnvironmentState();
+}
+
+function resetDeveloperEnvironment() {
+    environmentOverrides.season = "auto";
+    environmentOverrides.timeOfDay = "auto";
+    environmentOverrides.weather = "live";
+    environmentOverrides.windSpeedMph = null;
+    environmentOverrides.windDirection = null;
+    syncEnvironmentDevControls();
+    applyEnvironmentState();
+}
+
+function readWeatherCache() {
+    try {
+        const cached = JSON.parse(localStorage.getItem(WEATHER_CACHE_KEY) || "null");
+        if (!Number.isFinite(cached?.savedAt) || !cached?.data) return null;
+        const age = Date.now() - cached.savedAt;
+        if (age >= 0 && age < 24 * 60 * 60 * 1000) return { ...cached, age };
+    } catch (error) {
+        console.warn("[BCC Environment] Weather cache unavailable.", error);
+    }
+    return null;
+}
+
+async function fetchWinderWeather() {
+    if (weatherRequestPromise) return weatherRequestPromise;
+    weatherRequestPromise = (async () => {
+        let timeout = null;
+        try {
+            const controller = typeof AbortController === "function" ? new AbortController() : null;
+            const timeoutPromise = new Promise((_, reject) => {
+                timeout = window.setTimeout(() => {
+                    controller?.abort();
+                    reject(new Error("Weather request timed out after 9 seconds"));
+                }, 9000);
+            });
+            const url = "https://api.open-meteo.com/v1/forecast?latitude=33.9926&longitude=-83.7202&current=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,is_day,cloud_cover,precipitation,rain,snowfall&daily=sunrise,sunset&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm&timezone=America%2FNew_York&forecast_days=2";
+            const requestOptions = { cache: "no-store" };
+            if (controller) requestOptions.signal = controller.signal;
+            const dataPromise = fetch(url, requestOptions).then(async response => {
+                if (!response.ok) throw new Error(`Weather request returned ${response.status}`);
+                return response.json();
+            });
+            const data = await Promise.race([dataPromise, timeoutPromise]);
+            if (!data.current || !data.daily) throw new Error("Weather response was incomplete");
+
+            const current = data.current;
+            data.category = getWeatherCategory(current.weather_code, current.rain ?? current.precipitation ?? 0, current.snowfall ?? 0);
+            weatherObservation = data;
+            weatherObservationUpdatedAt = Date.now();
+            try {
+                localStorage.setItem(WEATHER_CACHE_KEY, JSON.stringify({ savedAt: weatherObservationUpdatedAt, data }));
+            } catch (error) {
+                console.warn("[BCC Environment] Weather cache could not be saved.", error);
+            }
+            applyEnvironmentState();
+        } catch (error) {
+            console.warn("[BCC Environment] Live weather unavailable; keeping seasonal appearance and local-time fallback.", error);
+            applyEnvironmentState();
+        } finally {
+            if (timeout !== null) window.clearTimeout(timeout);
+        }
+    })();
+
+    try {
+        await weatherRequestPromise;
+    } finally {
+        weatherRequestPromise = null;
+    }
+}
+
+function startWeatherPolling() {
+    clearTimeout(weatherRefreshTimer);
+    weatherRefreshTimer = null;
+    if (document.hidden) return;
+    weatherRefreshTimer = window.setTimeout(async () => {
+        weatherRefreshTimer = null;
+        await fetchWinderWeather();
+        startWeatherPolling();
+    }, WEATHER_REFRESH_MS);
+}
+
+function startEnvironmentStateRefresh() {
+    clearTimeout(environmentStateRefreshTimer);
+    environmentStateRefreshTimer = null;
+    if (document.hidden) return;
+    environmentStateRefreshTimer = window.setTimeout(() => {
+        environmentStateRefreshTimer = null;
+        applyEnvironmentState();
+        startEnvironmentStateRefresh();
+    }, 60 * 1000);
+}
+
+function triggerLightning() {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const lightningVisual = document.getElementById("lightningVisual");
+    let shape = 1 + Math.floor(Math.random() * 4);
+    if (shape === lastLightningShape) shape = shape % 4 + 1;
+    lastLightningShape = shape;
+    lightningVisual.dataset.shape = String(shape);
+    lightningVisual.style.setProperty("--strike-x", `${16 + Math.random() * 68}vw`);
+    lightningVisual.style.setProperty("--bolt-scale", (0.82 + Math.random() * 0.36).toFixed(2));
+    document.body.classList.remove("lightning-flash");
+    void document.body.offsetWidth;
+    document.body.classList.add("lightning-flash");
+    clearTimeout(currentLightningTimer);
+    currentLightningTimer = window.setTimeout(() => document.body.classList.remove("lightning-flash"), 720);
+}
+
+function updateLightningSchedule() {
+    if (environmentState.weather !== "thunderstorm" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        clearTimeout(lightningTimer);
+        lightningTimer = null;
+        return;
+    }
+    if (document.hidden || lightningTimer !== null) return;
+    lightningTimer = window.setTimeout(() => {
+        lightningTimer = null;
+        if (document.hidden || environmentState.weather !== "thunderstorm") return;
+        triggerLightning();
+        updateLightningSchedule();
+    }, 8000 + Math.random() * 22000);
+}
+
+function initializeEnvironmentSystem() {
+    const cached = readWeatherCache();
+    if (cached) {
+        weatherObservation = cached.data;
+        weatherObservationUpdatedAt = cached.savedAt;
+    }
+    applyEnvironmentState();
+    if (!cached || cached.age >= 10 * 60 * 1000) void fetchWinderWeather();
+    startWeatherPolling();
+    startEnvironmentStateRefresh();
+    initializeEnvironmentDevTools();
+}
+
+function shouldShowEnvironmentDevTools(url = location) {
+    const queryOverrideEnabled = new URLSearchParams(url.search).get("dev") === "1";
+    return queryOverrideEnabled;
+}
+
+function initializeEnvironmentDevTools() {
+    if (!shouldShowEnvironmentDevTools()) return;
+    document.body.classList.add("dev-environment-enabled");
+    const panel = document.getElementById("environmentDevTools");
+    panel.open = true;
+
+    document.getElementById("devSeason").addEventListener("change", event => {
+        environmentOverrides.season = event.currentTarget.value;
+        applyEnvironmentState();
+    });
+    document.getElementById("devTime").addEventListener("change", event => {
+        environmentOverrides.timeOfDay = event.currentTarget.value;
+        applyEnvironmentState();
+    });
+    document.getElementById("devWeather").addEventListener("change", event => {
+        environmentOverrides.weather = event.currentTarget.value;
+        applyEnvironmentState();
+    });
+    document.getElementById("devWindSpeed").addEventListener("input", event => {
+        environmentOverrides.windSpeedMph = Number(event.currentTarget.value);
+        applyEnvironmentState();
+    });
+    document.getElementById("devWindDirection").addEventListener("change", event => {
+        environmentOverrides.windDirection = event.currentTarget.value === "live"
+            ? null
+            : Number(event.currentTarget.value);
+        applyEnvironmentState();
+    });
+    document.querySelectorAll("[data-dev-preset]").forEach(button => {
+        button.addEventListener("click", () => applyDeveloperTestPreset(button.dataset.devPreset));
+    });
+    document.getElementById("devReset").addEventListener("click", resetDeveloperEnvironment);
+    document.getElementById("devFirework").addEventListener("click", () => {
+        environmentOverrides.season = "independence";
+        document.getElementById("devSeason").value = "independence";
+        applyEnvironmentState();
+        launchFirework();
+    });
+    document.getElementById("devLightning").addEventListener("click", triggerLightning);
+    document.getElementById("devRain").addEventListener("click", () => {
+        environmentOverrides.weather = "heavy-rain";
+        document.getElementById("devWeather").value = "heavy-rain";
+        applyEnvironmentState();
+    });
+
+    syncEnvironmentDevControls();
+}
+
+function setTheme(theme, deferParticleReset = false) {
     document.body.classList.remove(...seasonalClasses);
     if (theme !== "default") {
         document.body.classList.add(`theme-${theme}`);
     }
     document.body.dataset.theme = theme;
     currentTheme = theme;
-    resetParticles();
+    if (!deferParticleReset) resetParticles();
+
+    clearTimeout(santaFlybyTimer);
+    clearTimeout(witchFlybyTimer);
+    clearTimeout(presentDropTimer);
+    santaFlybyTimer = null;
+    witchFlybyTimer = null;
+    presentDropTimer = null;
+    document.getElementById("santaFlyby").classList.remove("is-flying");
+    document.getElementById("witchFlyby").classList.remove("is-flying");
+    const giftLayer = document.getElementById("giftDropLayer");
+    giftLayer.classList.remove("is-interacting");
+    giftLayer.replaceChildren();
+
     if (theme === "christmas") {
         scheduleSantaFlyby(9000 + Math.random() * 13000);
         schedulePresentDrop(5000 + Math.random() * 7000);
-    } else {
-        clearTimeout(santaFlybyTimer);
-        document.getElementById("santaFlyby").classList.remove("is-flying");
-        clearTimeout(presentDropTimer);
-        presentDropTimer = null;
-        const giftLayer = document.getElementById("giftDropLayer");
-        giftLayer.classList.remove("is-interacting");
-        giftLayer.replaceChildren();
+    } else if (theme === "halloween") {
+        scheduleWitchFlyby(7000 + Math.random() * 14000);
     }
     console.log(`[Barrow County Cruisers] Theme: ${theme}`);
 }
@@ -4807,22 +6422,53 @@ function scheduleSantaFlyby(delay) {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     santaFlybyTimer = window.setTimeout(() => {
+        santaFlybyTimer = null;
         if (currentTheme !== "christmas") return;
+        if (document.hidden) return;
         const santa = document.getElementById("santaFlyby");
         santa.classList.remove("is-flying");
         void santa.offsetWidth;
         santa.classList.add("is-flying");
-        window.setTimeout(() => santa.classList.remove("is-flying"), 13200);
         scheduleSantaFlyby(45000 + Math.random() * 45000);
     }, delay);
 }
+
+function scheduleWitchFlyby(delay) {
+    clearTimeout(witchFlybyTimer);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    witchFlybyTimer = window.setTimeout(() => {
+        witchFlybyTimer = null;
+        if (currentTheme !== "halloween") return;
+        if (document.hidden) return;
+        const witch = document.getElementById("witchFlyby");
+        witch.classList.remove("is-flying");
+        void witch.offsetWidth;
+        witch.classList.add("is-flying");
+        scheduleWitchFlyby(52000 + Math.random() * 52000);
+    }, delay);
+}
+
+document.getElementById("witchFlyby").addEventListener("animationend", event => {
+    if (event.animationName === "witchFlyBy") {
+        event.currentTarget.classList.remove("is-flying");
+    }
+});
+
+document.getElementById("santaFlyby").addEventListener("animationend", event => {
+    if (event.animationName === "santaFlyBy") {
+        event.currentTarget.classList.remove("is-flying");
+    }
+});
 
 function schedulePresentDrop(delay) {
     clearTimeout(presentDropTimer);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     presentDropTimer = window.setTimeout(() => {
+        presentDropTimer = null;
         if (currentTheme !== "christmas") return;
+        if (document.hidden) return;
 
         const layer = document.getElementById("giftDropLayer");
         if (layer.childElementCount < 3) {
@@ -4896,10 +6542,10 @@ document.addEventListener("click", event => {
 }, true);
 
 function applySeasonalTheme() {
-    setTheme(getSeasonalTheme());
+    applyEnvironmentState();
 }
 
-applySeasonalTheme();
+initializeEnvironmentSystem();
 
 const christmasLights = document.getElementById("christmasLights");
 for (let bulbIndex = 0; bulbIndex < 28; bulbIndex++) {
@@ -4907,15 +6553,7 @@ for (let bulbIndex = 0; bulbIndex < 28; bulbIndex++) {
     christmasLights.lastElementChild.className = "bulb";
 }
 
-if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    requestAnimationFrame(animate);
-}
-
-setInterval(() => {
-    if (getSeasonalTheme() !== currentTheme) {
-        applySeasonalTheme();
-    }
-}, 60 * 1000);
+startAnimationLoop();
 
 
 /* ==========================================================
