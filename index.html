@@ -4294,17 +4294,17 @@ const additionalUpcomingShows = [
         ]
     },
     {
-        id: "wicker-family-benefit-show",
+        id: "martin-strong-benefit",
         shortName: "Martin Strong Benefit Show",
         name: "Martin Strong Benefit Cars, Jeeps, Motorcycle & Tractors Show",
         subtitle: "Benefit for the Watkins family",
         summary: "Anything with wheels is welcome · Trophies · Cassie’s Pit Stop will have food and cold drinks",
-        flyer: "wicker's-family-benefit-show/1.webp",
-        supplementaryPhoto: "wicker's-family-benefit-show/2.webp",
+        flyer: "martin-strong-benefit/1.webp",
+        supplementaryPhoto: "martin-strong-benefit/2.webp",
         supplementaryAlt: "Our Little Warrior’s Testimony about Martin’s story",
         photos: [
-            { src: "wicker's-family-benefit-show/1.webp", filename: "Martin Strong Benefit Show flyer" },
-            { src: "wicker's-family-benefit-show/2.webp", filename: "Our Little Warrior’s Testimony" }
+            { src: "martin-strong-benefit/1.webp", filename: "Martin Strong Benefit Show flyer" },
+            { src: "martin-strong-benefit/2.webp", filename: "Our Little Warrior’s Testimony" }
         ],
         location: "1588 Carl-Bethlehem Rd, Auburn, GA 30011",
         time: "11:00 AM – 3:00 PM",
@@ -6943,7 +6943,7 @@ function isMartinStrongThemeActive() {
 }
 
 function applyScopedEventTheme(page) {
-    const shouldEnable = currentShow?.id === "wicker-family-benefit-show"
+    const shouldEnable = currentShow?.id === "martin-strong-benefit"
         && ["event-detail", "photos"].includes(page);
     const wasEnabled = isMartinStrongThemeActive();
     if (shouldEnable === wasEnabled) return;
