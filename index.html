@@ -3462,6 +3462,80 @@ body.theme-christmas .santa-flyby.is-flying .santa-arm {
     from { transform: rotate(-64deg); }
     to { transform: rotate(-37deg); }
 }
+
+/* Martin Strong event pages use their own flyer-matched evergreen palette. */
+body.martin-strong-theme {
+    --bg: #07130a;
+    --bg-soft: #0b1b0f;
+    --panel: #102518;
+    --panel-hover: #173721;
+    --text: #f4fff3;
+    --muted: #bfd4bd;
+    --accent: #49d84d;
+    --accent-light: #b9ff79;
+    --accent-secondary: #0c7a39;
+    --border: rgba(132, 237, 111, .16);
+    --border-accent: rgba(92, 226, 83, .42);
+    --glow: rgba(58, 206, 68, .2);
+    --glow-secondary: rgba(11, 122, 57, .16);
+    --hero-glow-1: rgba(73, 216, 77, .23);
+    --hero-glow-2: rgba(10, 118, 54, .2);
+    --selection-bg: #328f3b;
+    --selection-text: #fff;
+    --scrollbar: #49d84d;
+    background:
+        radial-gradient(ellipse at 8% 16%, rgba(49, 198, 66, .2), transparent 38%),
+        radial-gradient(ellipse at 90% 28%, rgba(138, 244, 83, .13), transparent 36%),
+        radial-gradient(ellipse at 46% 92%, rgba(9, 112, 50, .17), transparent 48%),
+        linear-gradient(180deg, #07130a, #09170c 54%, #040b06);
+}
+
+body.martin-strong-theme::after {
+    position: fixed;
+    z-index: 1;
+    inset: 0;
+    content: "";
+    pointer-events: none;
+    opacity: .34;
+    background:
+        radial-gradient(ellipse 16px 34px at 8% 32%, rgba(110, 231, 96, .2), transparent 76%),
+        radial-gradient(ellipse 13px 28px at 91% 64%, rgba(149, 246, 99, .16), transparent 76%),
+        radial-gradient(ellipse 11px 25px at 77% 18%, rgba(59, 197, 75, .16), transparent 78%),
+        radial-gradient(ellipse at 5% 75%, rgba(27, 127, 57, .18), transparent 24%),
+        radial-gradient(ellipse at 96% 35%, rgba(100, 212, 73, .14), transparent 25%);
+    animation: martinGreenAura 18s ease-in-out infinite alternate;
+}
+
+@keyframes martinGreenAura {
+    from { opacity: .22; transform: scale(1); }
+    to { opacity: .42; transform: scale(1.035); }
+}
+
+body.martin-strong-theme header {
+    background: rgba(5, 17, 8, .92);
+    border-bottom-color: rgba(115, 230, 97, .22);
+}
+
+body.martin-strong-theme .ambient.one { background: #45df51; opacity: .16; }
+body.martin-strong-theme .ambient.two { background: #a1f16a; opacity: .13; }
+body.martin-strong-theme .night-moon { filter: none; }
+body.martin-strong-theme .flyer-glow { background: linear-gradient(135deg, #8df264, #08733a); opacity: .34; }
+body.martin-strong-theme .event-info h1 { text-shadow: 0 0 28px rgba(75, 220, 75, .18); }
+body.martin-strong-theme .event-preview { box-shadow: 0 14px 42px rgba(0, 0, 0, .2), inset 0 1px rgba(180, 255, 155, .04); }
+
+body.martin-strong-theme .halloween-fog,
+body.martin-strong-theme .halloween-bats,
+body.martin-strong-theme .witch-flyby,
+body.martin-strong-theme .christmas-lights,
+body.martin-strong-theme .santa-flyby,
+body.martin-strong-theme .gift-drop-layer {
+    display: none !important;
+    animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.martin-strong-theme::after { animation: none; }
+}
 </style>
 </head>
 
@@ -4178,6 +4252,14 @@ const upcomingShow = {
     // Example: "front-row.webp", "crowd-01.jpg"
     photos: [],
 
+    subtitle: "Car, Bike and Truck Show · Trunk or Treat",
+    summary: "Car, Bike and Truck Show · Trunk or Treat",
+    time: "4:00 PM – 8:00 PM",
+    badge: "🎃 Upcoming Show",
+    details: [
+        { icon: "🎃", text: "Trunk or Treat: 5:00 PM – 7:00 PM" }
+    ],
+
     location:
         "189 W Athens St, Winder, GA 30680",
 
@@ -4189,6 +4271,56 @@ const upcomingShow = {
 
 };
 
+const additionalUpcomingShows = [
+    {
+        id: "christmas-show-2026",
+        shortName: "Christmas Showdown & Toy Round Up",
+        name: "Christmas Car, Bike, Truck, Motorcycle and Jeep Show",
+        subtitle: "Battle of the Best Showdown & Toy Round Up",
+        summary: "60+ trophies · Chili cook-off · Toy drive benefiting Winder Fire Department",
+        flyer: "christmas-show-2026/christmas-show-2026.webp",
+        photos: [],
+        location: "189 W Athens St, Winder, GA 30680",
+        time: "1:00 PM – 5:00 PM",
+        start: "2026-11-28T13:00:00-05:00",
+        end: "2026-11-28T17:00:00-05:00",
+        badge: "🎄 Christmas Show",
+        details: [
+            { icon: "🏆", text: "60+ trophies to be awarded" },
+            { icon: "🎁", text: "Bring a new, unwrapped toy for the Winder Fire Department toy round up" },
+            { icon: "🎅", text: "Santa, the Grinch and Buddy the Elf will appear; photos with Santa and ceramic gingerbread house and snowflake ornaments for kids to paint and take home" },
+            { icon: "🌶️", text: "Chili cook-off · Cassie’s Pit Stop will serve burgers, cheeseburgers, hotdogs, corn dogs, fries, cold drinks, hot chocolate and coffee" },
+            { icon: "💵", text: "Chili cook-off registration: $20 and a new, unwrapped toy" }
+        ]
+    },
+    {
+        id: "wicker-family-benefit-show",
+        shortName: "Martin Strong Benefit Show",
+        name: "Martin Strong Benefit Cars, Jeeps, Motorcycle & Tractors Show",
+        subtitle: "Benefit for the Watkins family",
+        summary: "Anything with wheels is welcome · Trophies · Cassie’s Pit Stop will have food and cold drinks",
+        flyer: "wicker's-family-benefit-show/1.webp",
+        supplementaryPhoto: "wicker's-family-benefit-show/2.webp",
+        supplementaryAlt: "Our Little Warrior’s Testimony about Martin’s story",
+        photos: [
+            { src: "wicker's-family-benefit-show/1.webp", filename: "Martin Strong Benefit Show flyer" },
+            { src: "wicker's-family-benefit-show/2.webp", filename: "Our Little Warrior’s Testimony" }
+        ],
+        location: "1588 Carl-Bethlehem Rd, Auburn, GA 30011",
+        time: "11:00 AM – 3:00 PM",
+        start: "2026-12-19T11:00:00-05:00",
+        end: "2026-12-19T15:00:00-05:00",
+        badge: "💚 Family Benefit Show",
+        details: [
+            { icon: "💚", text: "Benefit for the Watkins family and Martin’s treatment" },
+            { icon: "👕", text: "Please wear green, Martin’s favorite color" },
+            { icon: "🏆", text: "Trophies will be awarded; anything with wheels is welcome" },
+            { icon: "🎁", text: "$20 registration plus a new, unwrapped wheel-related toy or item" },
+            { icon: "🍔", text: "Cassie’s Pit Stop will have food and cold drinks" }
+        ]
+    }
+];
+
 const pastShows = [
     {
         id: "veterans-day-2026",
@@ -4197,6 +4329,8 @@ const pastShows = [
         subtitle: "Car, Bike & Truck Show",
         date: "2026-09-26",
         time: "3:00 PM – 7:00 PM",
+        start: "2026-09-26T15:00:00-04:00",
+        end: "2026-09-26T19:00:00-04:00",
         location: "189 W Athens St, Winder, GA 30680",
         note: "Veterans recognition and awards · Food from Cassie’s Pit Stop",
         flyer: "veterans-day-2026/veterans-day-2026.webp",
@@ -4217,57 +4351,75 @@ const veteransShowPhotos = [
 ];
 pastShows[0].photos = [...veteransBannerPhotos, ...veteransShowPhotos];
 
-const showStart = new Date(upcomingShow.start).getTime();
-const showEnd = new Date(upcomingShow.end).getTime();
-let renderedAsEnded = Date.now() >= showEnd;
+const scheduledShows = [upcomingShow, ...additionalUpcomingShows];
+let renderedEventSectionSignature = "";
 
-function showHasEnded() {
-    return Date.now() >= showEnd;
+function showHasEnded(show, now = Date.now()) {
+    return new Date(show.end).getTime() <= now;
 }
 
-function formatShowDate() {
-    return new Date(upcomingShow.start).toLocaleDateString("en-US", {
+function formatShowDate(show) {
+    return new Date(show.start).toLocaleDateString("en-US", {
         month: "long", day: "numeric", year: "numeric", timeZone: "America/New_York"
     });
+}
+
+function findShowById(id) {
+    return [...scheduledShows, ...pastShows].find(show => show.id === id) || upcomingShow;
 }
 
 function renderPastShowCard(show) {
-    const date = new Date(`${show.date}T12:00:00-04:00`).toLocaleDateString("en-US", {
+    const date = show.start ? formatShowDate(show) : new Date(`${show.date}T12:00:00-04:00`).toLocaleDateString("en-US", {
         month: "long", day: "numeric", year: "numeric", timeZone: "America/New_York"
     });
     return `
-        <article class="event-preview past archived-event" data-show-kind="past" data-show-index="${pastShows.indexOf(show)}" onclick="openShow(pastShows[${pastShows.indexOf(show)}])" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openShow(pastShows[${pastShows.indexOf(show)}])}">
+        <article class="event-preview past archived-event" data-show-id="${show.id}" onclick="openShowById('${show.id}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openShowById('${show.id}')}">
             <img src="${show.flyer}" alt="${show.name} ${show.subtitle} flyer" loading="lazy">
             <div>
                 <div class="event-preview-tag">🏁 Past show · ${date}</div>
                 <h2>${show.name} — ${show.subtitle}</h2>
-                <p>${show.time}<br>${show.location}<br>${show.note}</p>
+                <p>${show.time}<br>${show.location}<br>${show.summary || show.note}</p>
             </div>
             <div class="arrow" aria-hidden="true">→</div>
         </article>`;
 }
 
-function renderEventSections() {
-    const ended = showHasEnded();
-    renderedAsEnded = ended;
-    const card = `
-        <div class="event-preview ${ended ? "past" : ""}" data-show-kind="upcoming" onclick="openShow(upcomingShow)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openShow(upcomingShow)}">
-            <img src="${upcomingShow.flyer}" alt="${upcomingShow.shortName} flyer">
+function renderUpcomingShowCard(show) {
+    const date = formatShowDate(show);
+    return `
+        <article class="event-preview" data-show-id="${show.id}" onclick="openShowById('${show.id}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openShowById('${show.id}')}">
+            <img src="${show.flyer}" alt="${show.shortName} flyer" loading="lazy">
             <div>
-                <div class="event-preview-tag">${ended ? "🏁 Ended · " : "📅 "}${formatShowDate()}</div>
-                <h2>${upcomingShow.shortName}</h2>
-                <p>Barrow County Cruisers Car, Bike and Truck Show<br>4:00 PM – 8:00 PM<br>${upcomingShow.location}</p>
+                <div class="event-preview-tag">${show.badge || "📅 Upcoming Show"} · ${date}</div>
+                <h2>${show.shortName}</h2>
+                <p>${show.subtitle || show.name}<br>${show.time}<br>${show.location}<br>${show.summary || ""}</p>
             </div>
             <div class="arrow">→</div>
-        </div>`;
+        </article>`;
+}
 
-    document.getElementById("upcomingEvents").innerHTML = ended
-        ? '<p class="event-empty">There are no upcoming shows posted right now.</p>' : card;
-    const pastEventCards = pastShows
-        .slice()
-        .sort((first, second) => new Date(second.date) - new Date(first.date))
-        .map(renderPastShowCard);
-    if (ended) pastEventCards.unshift(card);
+function renderEventSections() {
+    const now = Date.now();
+    const upcoming = scheduledShows
+        .filter(show => !showHasEnded(show, now))
+        .sort((first, second) => new Date(first.start) - new Date(second.start));
+    const completed = [
+        ...pastShows,
+        ...scheduledShows.filter(show => showHasEnded(show, now))
+    ].sort((first, second) => {
+        const firstDate = new Date(first.start || `${first.date}T12:00:00-04:00`);
+        const secondDate = new Date(second.start || `${second.date}T12:00:00-04:00`);
+        return secondDate - firstDate;
+    });
+
+    renderedEventSectionSignature = scheduledShows
+        .map(show => `${show.id}:${showHasEnded(show, now) ? "past" : "upcoming"}`)
+        .join("|");
+
+    document.getElementById("upcomingEvents").innerHTML = upcoming.length
+        ? upcoming.map(renderUpcomingShowCard).join("")
+        : '<p class="event-empty">There are no upcoming shows posted right now.</p>';
+    const pastEventCards = completed.map(renderPastShowCard);
     document.getElementById("pastEvents").innerHTML = pastEventCards.length
         ? pastEventCards.join("")
         : '<p class="event-empty">Past shows will appear here after they end.</p>';
@@ -4275,7 +4427,7 @@ function renderEventSections() {
         <p id="photoStatus" class="photo-status" hidden></p>
         <div id="photoGrid" class="photo-grid"></div>`;
     renderConfiguredPhotos();
-    if (currentShow === upcomingShow) renderEventDetail(upcomingShow);
+    renderEventDetail(currentShow);
 }
 
 let currentShow = upcomingShow;
@@ -4287,10 +4439,8 @@ function openShow(show) {
     openPage("event-detail");
 }
 
-function formatPastShowDate(show) {
-    return new Date(`${show.date}T12:00:00-04:00`).toLocaleDateString("en-US", {
-        month: "long", day: "numeric", year: "numeric", timeZone: "America/New_York"
-    });
+function openShowById(id) {
+    openShow(findShowById(id));
 }
 
 function zeroCountdownDigits() {
@@ -4300,9 +4450,10 @@ function zeroCountdownDigits() {
 }
 
 function renderEventDetail(show) {
-    const isUpcoming = show === upcomingShow;
-    const date = isUpcoming ? formatShowDate() : formatPastShowDate(show);
-    const time = isUpcoming ? "4:00 PM – 8:00 PM" : show.time;
+    const isEnded = showHasEnded(show);
+    const isActive = !isEnded && new Date(show.start).getTime() <= Date.now();
+    const date = formatShowDate(show);
+    const time = show.time;
     const location = show.location;
     const flyer = document.getElementById("eventFlyer");
     flyer.src = show.flyer;
@@ -4312,21 +4463,30 @@ function renderEventDetail(show) {
     supplementaryImage.hidden = !show.supplementaryPhoto;
     document.querySelector(".event-flyer-pair").classList.toggle("has-supplementary", Boolean(show.supplementaryPhoto));
     supplementaryImage.src = show.supplementaryPhoto || "";
-    supplementaryImage.alt = show.supplementaryPhoto ? "Thank you to veterans photo" : "";
-    document.getElementById("eventTag").textContent = isUpcoming ? "🎃 Upcoming Show" : "🏁 Past Show";
+    supplementaryImage.alt = show.supplementaryPhoto
+        ? (show.supplementaryAlt || `${show.shortName || show.name} supporting image`)
+        : "";
+    document.getElementById("eventTag").textContent = isEnded ? "🏁 Past Show" : (show.badge || "📅 Upcoming Show");
     document.getElementById("eventName").textContent = show.name;
     document.getElementById("eventLocation").innerHTML = `${date}<br>${time}<br>${location}`;
-    document.getElementById("eventDetails").innerHTML = isUpcoming
-        ? `<div class="detail">📅 <b>${date}</b></div><div class="detail">🕓 <b>${time}</b></div><div class="detail">🎃 <b>Trunk or Treat: 5:00 PM – 7:00 PM</b></div><div class="detail">📍 <b>${location}</b></div>`
-        : `<div class="detail">📅 <b>${date}</b></div><div class="detail">🕓 <b>${time}</b></div><div class="detail">📍 <b>${location}</b></div><div class="detail">🇺🇸 <b>${show.note}</b></div>`;
+    const details = [
+        { icon: "📅", text: date },
+        { icon: "🕓", text: time },
+        ...(show.details || []),
+        { icon: "📍", text: location }
+    ];
+    if (show.note) details.splice(details.length - 1, 0, { icon: "ℹ️", text: show.note });
+    document.getElementById("eventDetails").innerHTML = details
+        .map(item => `<div class="detail">${item.icon} <b>${item.text}</b></div>`)
+        .join("");
     document.getElementById("countdownArea").style.display = "block";
-    document.getElementById("countdownLabel").textContent = isUpcoming && !showHasEnded()
-        ? "Show starts in"
-        : "Show ended";
-    if (!isUpcoming || showHasEnded()) zeroCountdownDigits();
+    document.getElementById("countdownLabel").textContent = isEnded
+        ? "Show ended"
+        : (isActive ? "Show is happening now" : "Show starts in");
+    if (isEnded) zeroCountdownDigits();
     const status = document.getElementById("eventStatus");
-    status.style.display = isUpcoming && !showHasEnded() ? "none" : "block";
-    status.textContent = isUpcoming && !showHasEnded() ? "" : "🏁 Show Ended";
+    status.style.display = isActive || isEnded ? "block" : "none";
+    status.textContent = isEnded ? "🏁 Show Ended" : (isActive ? "🎉 The show is happening now!" : "");
     document.querySelector(".photos-link span:last-child").textContent = `Open ${show.shortName || show.name}’s photo gallery →`;
     renderConfiguredPhotos();
 }
@@ -4370,9 +4530,9 @@ function renderConfiguredPhotos() {
     const photos = currentShow.photos || [];
     if (!photos.length) {
         status.hidden = false;
-        status.textContent = currentShow === upcomingShow
-            ? "No photos yet for this show. Check back after the event!"
-            : `No photos yet for ${currentShow.shortName || currentShow.name}. Check back later!`;
+        status.textContent = showHasEnded(currentShow)
+            ? `No event photos have been added for ${currentShow.shortName || currentShow.name} yet.`
+            : `No photos yet for ${currentShow.shortName || currentShow.name}. Check back after the event!`;
         return;
     }
 
@@ -4456,6 +4616,8 @@ document.getElementById("photoLightbox").addEventListener("animationend", event 
 
 document.getElementById("photoLightbox").addEventListener("close", event => {
     event.currentTarget.classList.remove("is-opening", "is-closing");
+    const activePage = document.querySelector(".page.active")?.id.replace("page-", "") || "home";
+    applyScopedEventTheme(activePage);
 });
 
 document.getElementById("photoLightbox").addEventListener("cancel", event => {
@@ -4517,15 +4679,12 @@ document.addEventListener("click", event => {
     } catch {
         filename = image.alt || filename;
     }
-    const eventCardWithDetails = image.closest(".event-preview[onclick]");
-    if (eventCardWithDetails?.dataset.showKind === "past") {
-        currentShow = pastShows[Number(eventCardWithDetails.dataset.showIndex)];
+    const eventCard = image.closest(".event-preview[data-show-id]");
+    if (eventCard) {
+        currentShow = findShowById(eventCard.dataset.showId);
         try { sessionStorage.setItem("barrowCountyCruisersSelectedShow", currentShow.id); } catch {}
         renderEventDetail(currentShow);
-    } else if (eventCardWithDetails?.dataset.showKind === "upcoming") {
-        currentShow = upcomingShow;
-        try { sessionStorage.setItem("barrowCountyCruisersSelectedShow", currentShow.id); } catch {}
-        renderEventDetail(currentShow);
+        applyScopedEventTheme("photos");
     }
     openPhoto(source, image.alt || filename, filename);
 }, true);
@@ -4756,6 +4915,7 @@ function resetParticles() {
 
     }
 
+    if (isMartinStrongThemeActive()) count = 0;
     if (window.innerWidth < 768) count = Math.ceil(count * .62);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) count = Math.ceil(count * .25);
 
@@ -4848,7 +5008,7 @@ function createParticle(initial = false) {
         p.color = Math.random() < .55 ? "#f5b9cc" : "#d8ef8b";
     }
 
-    if (currentTheme === "halloween") {
+    if (currentTheme === "halloween" && !isMartinStrongThemeActive()) {
         p.color = Math.random() < .5 ? "#ff8b2c" : "#be72e8";
     }
 
@@ -5274,6 +5434,7 @@ function drawHeart(
    ========================================================= */
 
 function drawParticles(time) {
+    if (isMartinStrongThemeActive()) return;
 
     for (const p of particles) {
 
@@ -6625,10 +6786,10 @@ function setTheme(theme, deferParticleReset = false) {
     giftLayer.classList.remove("is-interacting");
     giftLayer.replaceChildren();
 
-    if (theme === "christmas") {
+    if (theme === "christmas" && !isMartinStrongThemeActive()) {
         scheduleSantaFlyby(9000 + Math.random() * 13000);
         schedulePresentDrop(5000 + Math.random() * 7000);
-    } else if (theme === "halloween") {
+    } else if (theme === "halloween" && !isMartinStrongThemeActive()) {
         scheduleWitchFlyby(7000 + Math.random() * 14000);
     }
     console.log(`[Barrow County Cruisers] Theme: ${theme}`);
@@ -6636,11 +6797,11 @@ function setTheme(theme, deferParticleReset = false) {
 
 function scheduleSantaFlyby(delay) {
     clearTimeout(santaFlybyTimer);
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (isMartinStrongThemeActive() || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     santaFlybyTimer = window.setTimeout(() => {
         santaFlybyTimer = null;
-        if (currentTheme !== "christmas") return;
+        if (currentTheme !== "christmas" || isMartinStrongThemeActive()) return;
         if (document.hidden) return;
         const santa = document.getElementById("santaFlyby");
         santa.classList.remove("is-flying");
@@ -6652,11 +6813,11 @@ function scheduleSantaFlyby(delay) {
 
 function scheduleWitchFlyby(delay) {
     clearTimeout(witchFlybyTimer);
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (isMartinStrongThemeActive() || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     witchFlybyTimer = window.setTimeout(() => {
         witchFlybyTimer = null;
-        if (currentTheme !== "halloween") return;
+        if (currentTheme !== "halloween" || isMartinStrongThemeActive()) return;
         if (document.hidden) return;
         const witch = document.getElementById("witchFlyby");
         witch.classList.remove("is-flying");
@@ -6680,11 +6841,11 @@ document.getElementById("santaFlyby").addEventListener("animationend", event => 
 
 function schedulePresentDrop(delay) {
     clearTimeout(presentDropTimer);
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (isMartinStrongThemeActive() || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     presentDropTimer = window.setTimeout(() => {
         presentDropTimer = null;
-        if (currentTheme !== "christmas") return;
+        if (currentTheme !== "christmas" || isMartinStrongThemeActive()) return;
         if (document.hidden) return;
 
         const layer = document.getElementById("giftDropLayer");
@@ -6777,7 +6938,45 @@ startAnimationLoop();
    PAGE NAVIGATION
    ========================================================== */
 
+function isMartinStrongThemeActive() {
+    return document.body.classList.contains("martin-strong-theme");
+}
+
+function applyScopedEventTheme(page) {
+    const shouldEnable = currentShow?.id === "wicker-family-benefit-show"
+        && ["event-detail", "photos"].includes(page);
+    const wasEnabled = isMartinStrongThemeActive();
+    if (shouldEnable === wasEnabled) return;
+
+    document.body.classList.toggle("martin-strong-theme", shouldEnable);
+    clearTimeout(witchFlybyTimer);
+    clearTimeout(santaFlybyTimer);
+    clearTimeout(presentDropTimer);
+    witchFlybyTimer = null;
+    santaFlybyTimer = null;
+    presentDropTimer = null;
+    document.getElementById("witchFlyby").classList.remove("is-flying");
+    document.getElementById("santaFlyby").classList.remove("is-flying");
+    const giftLayer = document.getElementById("giftDropLayer");
+    giftLayer.classList.remove("is-interacting");
+    giftLayer.replaceChildren();
+
+    resetParticles();
+    configureEnvironmentParticles();
+
+    if (!shouldEnable && !document.hidden && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        if (currentTheme === "christmas") {
+            scheduleSantaFlyby(7000 + Math.random() * 9000);
+            schedulePresentDrop(5000 + Math.random() * 7000);
+        } else if (currentTheme === "halloween") {
+            scheduleWitchFlyby(6000 + Math.random() * 9000);
+        }
+    }
+}
+
 function openPage(page) {
+
+    applyScopedEventTheme(page);
 
     document
         .querySelectorAll(".page")
@@ -6879,158 +7078,44 @@ renderEventSections();
    ========================================================== */
 
 function updateCountdown() {
+    const now = Date.now();
+    const signature = scheduledShows
+        .map(show => `${show.id}:${showHasEnded(show, now) ? "past" : "upcoming"}`)
+        .join("|");
+    if (signature !== renderedEventSectionSignature) renderEventSections();
 
-    const now =
-        Date.now();
-
-    if (showHasEnded() !== renderedAsEnded) {
-        renderEventSections();
-    }
-
-
-    const countdown =
-        document.getElementById(
-            "countdownArea"
-        );
-
-
-    const status =
-        document.getElementById(
-            "eventStatus"
-        );
-
+    const countdown = document.getElementById("countdownArea");
+    const status = document.getElementById("eventStatus");
     const countdownLabel = document.getElementById("countdownLabel");
+    const start = new Date(currentShow.start).getTime();
+    const end = new Date(currentShow.end).getTime();
 
-    if (currentShow !== upcomingShow) {
+    if (now < start) {
         countdown.style.display = "block";
-        countdownLabel.textContent = "Show ended";
-        status.style.display = "block";
-        status.textContent = "🏁 Show Ended";
-        zeroCountdownDigits();
-        return;
-    }
-
-
-    /* BEFORE EVENT */
-
-    if (now < showStart) {
-
-        countdown.style.display =
-            "block";
-
         countdownLabel.textContent = "Show starts in";
+        status.style.display = "none";
 
-        status.style.display =
-            "none";
-
-
-        const difference =
-                showStart - now;
-
-
-        const days =
-            Math.floor(
-                difference /
-                86400000
-            );
-
-
-        const hours =
-            Math.floor(
-                (
-                    difference %
-                    86400000
-                ) /
-                3600000
-            );
-
-
-        const minutes =
-            Math.floor(
-                (
-                    difference %
-                    3600000
-                ) /
-                60000
-            );
-
-
-        const seconds =
-            Math.floor(
-                (
-                    difference %
-                    60000
-                ) /
-                1000
-            );
-
-
-        document.getElementById(
-            "days"
-        ).textContent =
-            String(days)
-            .padStart(2,"0");
-
-
-        document.getElementById(
-            "hours"
-        ).textContent =
-            String(hours)
-            .padStart(2,"0");
-
-
-        document.getElementById(
-            "minutes"
-        ).textContent =
-            String(minutes)
-            .padStart(2,"0");
-
-
-        document.getElementById(
-            "seconds"
-        ).textContent =
-            String(seconds)
-            .padStart(2,"0");
-
-
+        const difference = start - now;
+        document.getElementById("days").textContent = String(Math.floor(difference / 86400000)).padStart(2, "0");
+        document.getElementById("hours").textContent = String(Math.floor((difference % 86400000) / 3600000)).padStart(2, "0");
+        document.getElementById("minutes").textContent = String(Math.floor((difference % 3600000) / 60000)).padStart(2, "0");
+        document.getElementById("seconds").textContent = String(Math.floor((difference % 60000) / 1000)).padStart(2, "0");
         return;
-
     }
 
-
-    /* EVENT ACTIVE */
-
-    if (
-        now >= showStart &&
-        now < showEnd
-    ) {
-
-        countdown.style.display =
-            "none";
-
-        status.style.display =
-            "block";
-
-        status.innerHTML =
-            "🎃 The show is happening now!";
-
+    if (now < end) {
+        countdown.style.display = "none";
+        countdownLabel.textContent = "Show is happening now";
+        status.style.display = "block";
+        status.textContent = "🎉 The show is happening now!";
         return;
-
     }
 
-
-    /* EVENT FINISHED */
-
-    countdown.style.display =
-        "none";
-
+    countdown.style.display = "block";
+    countdownLabel.textContent = "Show ended";
     zeroCountdownDigits();
-
-    status.style.display =
-        "block";
-
-    status.innerHTML =
-        "🏁 Show Ended";
+    status.style.display = "block";
+    status.textContent = "🏁 Show Ended";
 
 }
 
@@ -7054,7 +7139,7 @@ try { savedEventId = sessionStorage.getItem("barrowCountyCruisersSelectedShow") 
 const restoreEventId = requestedEventId || savedEventId;
 
 if (restoreEventId) {
-    currentShow = pastShows.find(show => show.id === restoreEventId) || upcomingShow;
+    currentShow = findShowById(restoreEventId);
     renderEventDetail(currentShow);
 }
 
