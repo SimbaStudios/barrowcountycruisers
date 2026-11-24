@@ -58,29 +58,6 @@ body {
         );
 }
 
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-
-    background-image:
-        linear-gradient(
-            rgba(255,255,255,.018) 1px,
-            transparent 1px
-        ),
-        linear-gradient(
-            90deg,
-            rgba(255,255,255,.018) 1px,
-            transparent 1px
-        );
-
-    background-size: 55px 55px;
-    mask-image:
-        linear-gradient(to bottom, black, transparent 80%);
-}
-
-
 /* =========================================================
    HEADER
    ========================================================= */
@@ -242,6 +219,33 @@ nav button.active {
     max-width: 850px;
 }
 
+.season-test-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 18px auto 0;
+    color: var(--muted);
+    font-size: .82rem;
+}
+
+.season-test-control select {
+    min-height: 38px;
+    max-width: 220px;
+    padding: 7px 34px 7px 11px;
+    border: 1px solid var(--border-accent);
+    border-radius: 10px;
+    color: var(--text);
+    background: color-mix(in srgb, var(--panel-solid, #111417) 92%, transparent);
+    font: inherit;
+    cursor: pointer;
+}
+
+@media (max-width: 520px) {
+    .season-test-control { flex-direction: column; gap: 6px; }
+    .season-test-control select { width: min(100%, 250px); }
+}
+
 .eyebrow {
     color: var(--orange2);
 
@@ -291,11 +295,18 @@ nav button.active {
     line-height: 1.8;
 }
 
-.home-facebook-link {
+.home-links {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.home-social-link {
     display: inline-flex;
     align-items: center;
     gap: 9px;
-    margin-top: 22px;
     padding: 12px 17px;
     border: 1px solid rgba(255,106,0,.32);
     border-radius: 12px;
@@ -306,7 +317,7 @@ nav button.active {
     transition: .2s;
 }
 
-.home-facebook-link:hover {
+.home-social-link:hover {
     border-color: rgba(255,106,0,.65);
     background: rgba(255,106,0,.15);
     transform: translateY(-2px);
@@ -405,14 +416,37 @@ nav button.active {
 
     border-radius: 15px;
 
-    font-size: 1.5rem;
-
     background:
         rgba(255,106,0,.10);
 
     border:
         1px solid rgba(255,106,0,.18);
 }
+
+.calendar-mark {
+    position: relative;
+    width: 24px;
+    height: 22px;
+    border: 2px solid currentColor;
+    border-radius: 5px;
+    background:
+        linear-gradient(currentColor, currentColor) 0 6px / 100% 2px no-repeat,
+        radial-gradient(circle, currentColor 1.4px, transparent 1.6px) 4px 11px / 7px 7px repeat;
+}
+
+.calendar-mark::before,
+.calendar-mark::after {
+    position: absolute;
+    top: -5px;
+    width: 2px;
+    height: 7px;
+    border-radius: 2px;
+    background: currentColor;
+    content: "";
+}
+
+.calendar-mark::before { left: 4px; }
+.calendar-mark::after { right: 4px; }
 
 .menu-card.photos .menu-icon {
     background:
@@ -1148,6 +1182,9 @@ body:not(.weather-unknown) .weather-indicator .weather-summary-short { display: 
 }
 
 .detail {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
     padding:
         13px 15px;
 
@@ -1164,6 +1201,16 @@ body:not(.weather-unknown) .weather-indicator .weather-summary-short { display: 
 
 .detail b {
     color: white;
+    font-weight: 650;
+}
+
+.detail::before {
+    flex: 0 0 3px;
+    align-self: stretch;
+    min-height: 1.2em;
+    border-radius: 3px;
+    background: var(--accent-light);
+    content: "";
 }
 
 
@@ -2182,9 +2229,7 @@ body.theme-christmas .event-label {
 /* =========================================================
    SMOOTH SEASON CHANGES
 
-   Obviously nobody is going to sit on the page from
-   September 30 at 11:59 PM waiting for this 😂
-   but transitions also make developer theme previews nicer.
+   Smooth transitions help seasonal previews feel natural.
    ========================================================= */
 
 body,
@@ -2270,13 +2315,13 @@ body {
     background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
-.home-facebook-link,
+.home-social-link,
 .photos-link {
     border-color: var(--border-accent);
     background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
-.home-facebook-link:hover,
+.home-social-link:hover,
 .photos-link:hover {
     border-color: var(--accent-light);
     background: color-mix(in srgb, var(--accent) 15%, transparent);
@@ -2294,8 +2339,451 @@ body.theme-christmas .home-hero {
         radial-gradient(circle at 80% 65%, var(--hero-glow-2), transparent 38%);
 }
 
-body::before {
+/* A softly lit evergreen scene frames the home page without covering its content. */
+body.theme-christmas .home-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+}
+
+body.theme-christmas .home-content {
+    position: relative;
+    z-index: 1;
+}
+
+body.theme-christmas .home-hero::before,
+body.theme-christmas .home-hero::after {
+    position: absolute;
     z-index: 0;
+    bottom: -22px;
+    width: clamp(145px, 19vw, 245px);
+    height: clamp(245px, 34vw, 390px);
+    content: "";
+    opacity: .48;
+    pointer-events: none;
+    clip-path: polygon(50% 0, 57% 13%, 54% 13%, 66% 28%, 61% 28%, 75% 43%, 68% 43%, 84% 60%, 75% 60%, 94% 79%, 62% 79%, 62% 100%, 38% 100%, 38% 79%, 6% 79%, 25% 60%, 16% 60%, 32% 43%, 25% 43%, 39% 28%, 34% 28%, 46% 13%, 43% 13%);
+    background:
+        radial-gradient(circle at 50% 5%, #ffe9a4 0 5px, transparent 7px),
+        radial-gradient(circle at 35% 31%, #ed4850 0 4px, transparent 6px),
+        radial-gradient(circle at 66% 37%, #ffd86b 0 4px, transparent 6px),
+        radial-gradient(circle at 47% 49%, #f4f0d2 0 3px, transparent 5px),
+        radial-gradient(circle at 31% 61%, #e54a47 0 4px, transparent 6px),
+        radial-gradient(circle at 66% 66%, #f4d46a 0 4px, transparent 6px),
+        radial-gradient(circle at 49% 79%, #f4f0d2 0 4px, transparent 6px),
+        linear-gradient(110deg, #176c3e, #064326 55%, #032c1b);
+    filter: drop-shadow(0 0 20px rgba(63, 186, 103, .18));
+}
+
+body.theme-christmas .home-hero::before {
+    left: max(1.5%, calc(50% - 590px));
+}
+
+body.theme-christmas .home-hero::after {
+    right: max(1.5%, calc(50% - 590px));
+    transform: scale(.82) rotate(3deg);
+    transform-origin: bottom center;
+    opacity: .36;
+}
+
+body.theme-christmas .home-content h1 span {
+    background: linear-gradient(100deg, #ffe38a 0%, #f5f2df 34%, #73d697 68%, #ffd36a 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 5px 20px rgba(48, 185, 101, .19));
+}
+
+body.theme-christmas .home-social-link,
+body.theme-christmas .menu-card,
+body.theme-christmas .event-preview {
+    border-color: rgba(231, 198, 91, .28);
+    box-shadow: 0 16px 42px rgba(0, 0, 0, .20), inset 0 1px rgba(255, 245, 202, .06);
+}
+
+body.theme-christmas .menu-card:hover,
+body.theme-christmas .event-preview:hover {
+    border-color: rgba(231, 198, 91, .62);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, .3), 0 0 26px rgba(47, 160, 83, .12), inset 0 1px rgba(255, 245, 202, .1);
+}
+
+body.theme-christmas .menu-card,
+body.theme-christmas .event-preview {
+    background:
+        radial-gradient(ellipse at 100% 0%, rgba(201, 48, 56, .1), transparent 42%),
+        linear-gradient(145deg, color-mix(in srgb, var(--panel) 92%, #12351f), color-mix(in srgb, var(--bg-soft) 92%, #071b10));
+}
+
+body.theme-christmas .home-hero::before {
+    animation: christmasTreeGlow 7s ease-in-out infinite alternate;
+}
+
+body.theme-christmas .home-hero::after {
+    animation: christmasTreeGlow 9s ease-in-out -3s infinite alternate-reverse;
+}
+
+@keyframes christmasTreeGlow {
+    from { filter: drop-shadow(0 0 13px rgba(63, 186, 103, .12)) brightness(.92); }
+    to { filter: drop-shadow(0 0 26px rgba(63, 186, 103, .3)) brightness(1.12); }
+}
+
+body.theme-christmas::after {
+    position: fixed;
+    z-index: 0;
+    inset: -28% -22%;
+    content: "";
+    opacity: .19;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse at 18% 28%, rgba(48, 185, 120, .34), transparent 34%),
+        radial-gradient(ellipse at 52% 18%, rgba(60, 132, 119, .2), transparent 38%),
+        radial-gradient(ellipse at 82% 36%, rgba(207, 166, 62, .15), transparent 32%);
+    filter: blur(46px);
+    mix-blend-mode: screen;
+    transform: translate3d(-2%, -1%, 0) scale(1.04);
+    animation: christmasAuroraDrift 32s ease-in-out infinite alternate;
+}
+
+@keyframes christmasAuroraDrift {
+    from { transform: translate3d(-2%, -1%, 0) scale(1.04) rotate(-2deg); }
+    to { transform: translate3d(2%, 1.5%, 0) scale(1.1) rotate(2deg); }
+}
+
+/* Seasonal color fields add depth behind the page while the canvas carries the motion. */
+body[data-theme="default"]::after,
+body.theme-winter::after,
+body.theme-valentine::after,
+body.theme-spring::after,
+body.theme-showers::after,
+body.theme-late-spring::after,
+body.theme-summer::after,
+body.theme-independence::after,
+body.theme-fall::after,
+body.theme-halloween::after,
+body.theme-thanksgiving::after {
+    position: fixed;
+    z-index: 0;
+    inset: -24% -18%;
+    content: "";
+    opacity: .2;
+    pointer-events: none;
+    filter: blur(54px);
+    transform: translate3d(-1.5%, -1%, 0) scale(1.04);
+    animation: seasonalColorDrift 38s ease-in-out infinite alternate;
+}
+
+body[data-theme="default"]::after {
+    background:
+        radial-gradient(ellipse at 18% 28%, rgba(215, 25, 32, .26), transparent 34%),
+        radial-gradient(ellipse at 82% 26%, rgba(255, 104, 68, .16), transparent 32%),
+        radial-gradient(ellipse at 51% 92%, rgba(95, 13, 25, .2), transparent 42%);
+}
+
+body.theme-winter::after {
+    background:
+        radial-gradient(ellipse at 16% 24%, rgba(73, 184, 246, .28), transparent 34%),
+        radial-gradient(ellipse at 80% 38%, rgba(190, 235, 255, .2), transparent 30%),
+        radial-gradient(ellipse at 53% 90%, rgba(25, 104, 169, .18), transparent 42%);
+}
+
+body.theme-valentine::after {
+    background:
+        radial-gradient(ellipse at 18% 30%, rgba(229, 46, 105, .3), transparent 34%),
+        radial-gradient(ellipse at 83% 26%, rgba(255, 148, 184, .23), transparent 32%),
+        radial-gradient(ellipse at 54% 92%, rgba(129, 15, 58, .2), transparent 42%);
+}
+
+body.theme-spring::after {
+    background:
+        radial-gradient(ellipse at 20% 27%, rgba(72, 190, 111, .27), transparent 35%),
+        radial-gradient(ellipse at 82% 34%, rgba(255, 148, 190, .21), transparent 32%),
+        radial-gradient(ellipse at 52% 91%, rgba(174, 217, 111, .16), transparent 40%);
+}
+
+body.theme-showers::after {
+    background:
+        radial-gradient(ellipse at 14% 28%, rgba(75, 169, 222, .3), transparent 34%),
+        radial-gradient(ellipse at 78% 25%, rgba(162, 216, 221, .2), transparent 32%),
+        radial-gradient(ellipse at 48% 90%, rgba(66, 143, 104, .2), transparent 42%);
+}
+
+body.theme-late-spring::after {
+    background:
+        radial-gradient(ellipse at 18% 25%, rgba(84, 190, 83, .26), transparent 34%),
+        radial-gradient(ellipse at 81% 23%, rgba(246, 210, 94, .22), transparent 32%),
+        radial-gradient(ellipse at 53% 92%, rgba(47, 127, 62, .2), transparent 42%);
+}
+
+body.theme-summer::after {
+    background:
+        radial-gradient(ellipse at 18% 32%, rgba(255, 137, 42, .28), transparent 34%),
+        radial-gradient(ellipse at 81% 26%, rgba(43, 193, 220, .22), transparent 32%),
+        radial-gradient(ellipse at 50% 92%, rgba(110, 51, 124, .17), transparent 42%);
+}
+
+body.theme-independence::after {
+    background:
+        radial-gradient(ellipse at 16% 30%, rgba(227, 48, 64, .25), transparent 34%),
+        radial-gradient(ellipse at 82% 27%, rgba(80, 144, 235, .27), transparent 33%),
+        radial-gradient(ellipse at 51% 88%, rgba(232, 241, 255, .15), transparent 42%);
+}
+
+body.theme-fall::after {
+    background:
+        radial-gradient(ellipse at 17% 26%, rgba(221, 104, 36, .28), transparent 34%),
+        radial-gradient(ellipse at 82% 30%, rgba(246, 177, 67, .2), transparent 32%),
+        radial-gradient(ellipse at 51% 92%, rgba(108, 47, 20, .2), transparent 42%);
+}
+
+body.theme-halloween::after {
+    background:
+        radial-gradient(ellipse at 16% 29%, rgba(126, 47, 199, .3), transparent 35%),
+        radial-gradient(ellipse at 83% 31%, rgba(255, 104, 18, .25), transparent 32%),
+        radial-gradient(ellipse at 54% 91%, rgba(88, 145, 41, .16), transparent 40%);
+}
+
+body.theme-thanksgiving::after {
+    background:
+        radial-gradient(ellipse at 17% 26%, rgba(196, 84, 26, .27), transparent 34%),
+        radial-gradient(ellipse at 81% 28%, rgba(239, 177, 72, .24), transparent 33%),
+        radial-gradient(ellipse at 52% 91%, rgba(113, 65, 28, .2), transparent 42%);
+}
+
+@keyframes seasonalColorDrift {
+    from { transform: translate3d(-1.5%, -1%, 0) scale(1.04); }
+    to { transform: translate3d(1.5%, 1.2%, 0) scale(1.1); }
+}
+
+body[data-theme="default"] .home-hero {
+    background-image:
+        radial-gradient(ellipse at 50% 4%, rgba(255, 91, 73, .15), transparent 36%),
+        radial-gradient(ellipse at 12% 82%, rgba(164, 19, 28, .18), transparent 36%),
+        radial-gradient(ellipse at 89% 77%, rgba(87, 23, 30, .15), transparent 33%);
+}
+
+body.theme-winter .home-hero {
+    background-image:
+        radial-gradient(ellipse at 50% 1%, rgba(204, 241, 255, .16), transparent 34%),
+        radial-gradient(ellipse at 14% 88%, rgba(50, 147, 205, .13), transparent 35%),
+        radial-gradient(ellipse at 88% 79%, rgba(151, 222, 255, .1), transparent 32%);
+}
+
+body.theme-valentine .home-hero {
+    background-image:
+        radial-gradient(ellipse at 50% 8%, rgba(255, 164, 191, .15), transparent 35%),
+        radial-gradient(ellipse at 13% 82%, rgba(184, 22, 78, .18), transparent 35%),
+        radial-gradient(ellipse at 88% 76%, rgba(242, 77, 130, .12), transparent 32%);
+}
+
+body.theme-spring .home-hero {
+    background-image:
+        radial-gradient(ellipse at 50% 5%, rgba(188, 242, 162, .14), transparent 36%),
+        radial-gradient(ellipse at 12% 85%, rgba(63, 160, 92, .17), transparent 36%),
+        radial-gradient(ellipse at 90% 76%, rgba(242, 154, 192, .13), transparent 33%);
+}
+
+body.theme-showers .home-hero {
+    background-image:
+        radial-gradient(ellipse at 50% 1%, rgba(174, 225, 248, .16), transparent 36%),
+        radial-gradient(ellipse at 12% 82%, rgba(51, 130, 172, .17), transparent 35%),
+        radial-gradient(ellipse at 89% 77%, rgba(111, 180, 116, .12), transparent 32%);
+}
+
+body.theme-late-spring .home-hero {
+    background-image:
+        radial-gradient(ellipse at 50% 0%, rgba(255, 226, 136, .15), transparent 36%),
+        radial-gradient(ellipse at 12% 83%, rgba(54, 143, 68, .16), transparent 36%),
+        radial-gradient(ellipse at 90% 77%, rgba(170, 220, 93, .12), transparent 32%);
+}
+
+body.theme-summer .home-hero {
+    background-image:
+        radial-gradient(ellipse at 50% 7%, rgba(255, 161, 73, .2), transparent 38%),
+        radial-gradient(ellipse at 13% 84%, rgba(22, 130, 169, .17), transparent 36%),
+        radial-gradient(ellipse at 89% 78%, rgba(224, 94, 92, .12), transparent 32%);
+}
+
+body.theme-independence .home-hero {
+    background-image:
+        radial-gradient(ellipse at 50% 6%, rgba(238, 245, 255, .17), transparent 32%),
+        radial-gradient(ellipse at 13% 83%, rgba(211, 40, 58, .16), transparent 35%),
+        radial-gradient(ellipse at 89% 78%, rgba(49, 112, 202, .18), transparent 35%);
+}
+
+body.theme-fall .home-hero {
+    background-image:
+        radial-gradient(ellipse at 50% 3%, rgba(246, 190, 105, .15), transparent 36%),
+        radial-gradient(ellipse at 12% 83%, rgba(180, 77, 28, .18), transparent 36%),
+        radial-gradient(ellipse at 89% 78%, rgba(132, 62, 26, .15), transparent 33%);
+}
+
+body.theme-halloween .home-hero {
+    background-image:
+        radial-gradient(ellipse at 50% 4%, rgba(255, 126, 29, .16), transparent 35%),
+        radial-gradient(ellipse at 12% 82%, rgba(112, 34, 177, .21), transparent 36%),
+        radial-gradient(ellipse at 89% 77%, rgba(231, 99, 21, .14), transparent 32%);
+}
+
+body.theme-thanksgiving .home-hero {
+    background-image:
+        radial-gradient(ellipse at 50% 4%, rgba(250, 206, 123, .16), transparent 36%),
+        radial-gradient(ellipse at 12% 82%, rgba(175, 73, 26, .18), transparent 36%),
+        radial-gradient(ellipse at 89% 77%, rgba(115, 60, 25, .15), transparent 32%);
+}
+
+body[data-theme="default"] .menu-card,
+body[data-theme="default"] .event-preview,
+body[data-theme="default"] .event-card,
+body[data-theme="default"] .about-box,
+body.theme-winter .menu-card,
+body.theme-winter .event-preview,
+body.theme-winter .event-card,
+body.theme-winter .about-box,
+body.theme-valentine .menu-card,
+body.theme-valentine .event-preview,
+body.theme-valentine .event-card,
+body.theme-valentine .about-box,
+body.theme-spring .menu-card,
+body.theme-spring .event-preview,
+body.theme-spring .event-card,
+body.theme-spring .about-box,
+body.theme-showers .menu-card,
+body.theme-showers .event-preview,
+body.theme-showers .event-card,
+body.theme-showers .about-box,
+body.theme-late-spring .menu-card,
+body.theme-late-spring .event-preview,
+body.theme-late-spring .event-card,
+body.theme-late-spring .about-box,
+body.theme-summer .menu-card,
+body.theme-summer .event-preview,
+body.theme-summer .event-card,
+body.theme-summer .about-box,
+body.theme-independence .menu-card,
+body.theme-independence .event-preview,
+body.theme-independence .event-card,
+body.theme-independence .about-box,
+body.theme-fall .menu-card,
+body.theme-fall .event-preview,
+body.theme-fall .event-card,
+body.theme-fall .about-box,
+body.theme-halloween .menu-card,
+body.theme-halloween .event-preview,
+body.theme-halloween .event-card,
+body.theme-halloween .about-box,
+body.theme-thanksgiving .menu-card,
+body.theme-thanksgiving .event-preview,
+body.theme-thanksgiving .event-card,
+body.theme-thanksgiving .about-box {
+    border-color: color-mix(in srgb, var(--accent-light) 23%, var(--border));
+    box-shadow: 0 17px 46px rgba(0, 0, 0, .2), inset 0 1px rgba(255, 255, 255, .045);
+}
+
+body[data-theme="default"] .menu-card:hover,
+body[data-theme="default"] .event-preview:hover,
+body.theme-winter .menu-card:hover,
+body.theme-winter .event-preview:hover,
+body.theme-valentine .menu-card:hover,
+body.theme-valentine .event-preview:hover,
+body.theme-spring .menu-card:hover,
+body.theme-spring .event-preview:hover,
+body.theme-showers .menu-card:hover,
+body.theme-showers .event-preview:hover,
+body.theme-late-spring .menu-card:hover,
+body.theme-late-spring .event-preview:hover,
+body.theme-summer .menu-card:hover,
+body.theme-summer .event-preview:hover,
+body.theme-independence .menu-card:hover,
+body.theme-independence .event-preview:hover,
+body.theme-fall .menu-card:hover,
+body.theme-fall .event-preview:hover,
+body.theme-halloween .menu-card:hover,
+body.theme-halloween .event-preview:hover,
+body.theme-thanksgiving .menu-card:hover,
+body.theme-thanksgiving .event-preview:hover {
+    border-color: var(--accent-light);
+    box-shadow: 0 22px 54px rgba(0, 0, 0, .28), 0 0 28px var(--glow), inset 0 1px rgba(255, 255, 255, .08);
+}
+
+body.theme-christmas .christmas-lights {
+    top: 73px;
+    height: 28px;
+    align-items: flex-start;
+    filter: drop-shadow(0 3px 8px rgba(0, 0, 0, .55));
+}
+
+body.theme-christmas .christmas-lights::before {
+    position: absolute;
+    top: -2px;
+    left: -2%;
+    width: 104%;
+    height: 22px;
+    border-top: 2px solid rgba(18, 74, 42, .95);
+    border-radius: 0 0 50% 50%;
+    box-shadow: 0 -2px 0 rgba(202, 174, 77, .28);
+    content: "";
+}
+
+body.theme-christmas .bulb {
+    position: relative;
+    z-index: 1;
+    width: 11px;
+    height: 18px;
+    margin-top: 7px;
+    border-radius: 45% 45% 50% 50%;
+    animation-duration: 1.25s;
+}
+
+body.theme-christmas .bulb::before {
+    position: absolute;
+    top: -4px;
+    left: 3px;
+    width: 5px;
+    height: 5px;
+    border-radius: 2px 2px 0 0;
+    background: #b9a66a;
+    content: "";
+}
+
+body.theme-christmas .bulb:nth-child(4n+1) { background: radial-gradient(circle at 35% 28%, #ffc4a6, #ff3d48 62%); }
+body.theme-christmas .bulb:nth-child(4n+2) { background: radial-gradient(circle at 35% 28%, #d5ffd8, #41dc72 62%); }
+body.theme-christmas .bulb:nth-child(4n+3) { background: radial-gradient(circle at 35% 28%, #fff4c6, #f4c746 62%); }
+body.theme-christmas .bulb:nth-child(4n+4) { background: radial-gradient(circle at 35% 28%, #d9efff, #62adff 62%); }
+
+body.theme-christmas.time-day {
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(255, 222, 139, .19), transparent 43%),
+        radial-gradient(ellipse at 12% 35%, rgba(36, 137, 75, .18), transparent 40%),
+        radial-gradient(ellipse at 91% 50%, rgba(201, 48, 56, .12), transparent 38%),
+        linear-gradient(180deg, #183324 0%, #101d17 54%, #08110c 100%);
+}
+
+body.theme-christmas.time-sunset {
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(255, 155, 92, .22), transparent 46%),
+        radial-gradient(ellipse at 9% 48%, rgba(40, 128, 79, .16), transparent 40%),
+        linear-gradient(180deg, #281c22 0%, #11151b 55%, #070b0a 100%);
+}
+
+body.theme-christmas.time-night {
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(39, 117, 78, .22), transparent 42%),
+        radial-gradient(ellipse at 9% 47%, rgba(181, 37, 51, .15), transparent 38%),
+        radial-gradient(ellipse at 92% 58%, rgba(207, 166, 62, .1), transparent 34%),
+        linear-gradient(180deg, #06120d 0%, #080d12 58%, #020608 100%);
+}
+
+@media (max-width: 700px) {
+    body.theme-christmas .home-hero::before,
+    body.theme-christmas .home-hero::after {
+        width: 125px;
+        height: 230px;
+        opacity: .25;
+    }
+}
+
+@media (max-width: 480px) {
+    body.theme-christmas .home-hero::before,
+    body.theme-christmas .home-hero::after { opacity: .13; }
 }
 
 main,
@@ -2639,6 +3127,7 @@ body.page-hidden .environment-atmosphere::after {
     animation-play-state: paused !important;
 }
 
+body.page-hidden::after,
 body.page-hidden .lightning-visual { animation-play-state: paused !important; }
 
 @keyframes stormGlow {
@@ -2665,7 +3154,21 @@ body.page-hidden .lightning-visual { animation-play-state: paused !important; }
     .environment-atmosphere,
     .environment-atmosphere::before,
     .environment-atmosphere::after,
-    .night-moon { transition: none; animation: none !important; }
+    .night-moon,
+    body.theme-christmas::after,
+    body[data-theme="default"]::after,
+    body.theme-winter::after,
+    body.theme-valentine::after,
+    body.theme-spring::after,
+    body.theme-showers::after,
+    body.theme-late-spring::after,
+    body.theme-summer::after,
+    body.theme-independence::after,
+    body.theme-fall::after,
+    body.theme-halloween::after,
+    body.theme-thanksgiving::after,
+    body.theme-christmas .home-hero::before,
+    body.theme-christmas .home-hero::after { transition: none; animation: none !important; }
     .lightning-visual { display: none !important; }
 }
 
@@ -3732,12 +4235,39 @@ body.martin-strong-theme .gift-drop-layer {
 
             </p>
 
-            <a class="home-facebook-link"
-               href="https://www.facebook.com/share/g/1GnszEgoTB/"
-               target="_blank"
-               rel="noopener noreferrer">
-                f&nbsp; Find Barrow County Cruisers on Facebook ↗
-            </a>
+            <div class="home-links">
+                <a class="home-social-link"
+                   href="https://www.facebook.com/share/g/1GnszEgoTB/"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    Find Barrow County Cruisers on Facebook
+                </a>
+                <a class="home-social-link"
+                   href="https://www.simbastudios.win"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    Visit Simba Studios
+                </a>
+            </div>
+
+            <div class="season-test-control">
+                <label for="homeThemeTest">Test seasonal theme</label>
+                <select id="homeThemeTest" aria-label="Choose a seasonal theme to preview">
+                    <option value="auto">Automatic season</option>
+                    <option value="default">Georgia Red</option>
+                    <option value="winter">Winter</option>
+                    <option value="valentine">Valentine</option>
+                    <option value="spring">Early Spring</option>
+                    <option value="showers">Spring Showers</option>
+                    <option value="late-spring">Late Spring</option>
+                    <option value="summer">Summer</option>
+                    <option value="independence">Independence Day</option>
+                    <option value="fall">Fall</option>
+                    <option value="halloween">Halloween</option>
+                    <option value="thanksgiving">Thanksgiving</option>
+                    <option value="christmas">Christmas</option>
+                </select>
+            </div>
 
         </div>
 
@@ -3757,8 +4287,8 @@ body.martin-strong-theme .gift-drop-layer {
             onclick="openPage('events')"
             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPage('events')}">
 
-            <div class="menu-icon">
-                📅
+            <div class="menu-icon" aria-hidden="true">
+                <span class="calendar-mark"></span>
             </div>
 
             <h2>
@@ -3951,7 +4481,7 @@ body.martin-strong-theme .gift-drop-layer {
 
 
             <div class="event-tag" id="eventTag">
-                🎃 Upcoming Show
+                Upcoming Show
             </div>
 
 
@@ -4047,7 +4577,7 @@ body.martin-strong-theme .gift-drop-layer {
 
 
             <button class="photos-link" onclick="openPhotos()">
-                <span>📷 Show Photos</span>
+                <span>Show Photos</span>
                 <span>Open this event’s photo gallery →</span>
             </button>
 
@@ -4379,9 +4909,9 @@ const upcomingShow = {
     subtitle: "Car, Bike and Truck Show · Trunk or Treat",
     summary: "Car, Bike and Truck Show · Trunk or Treat",
     time: "4:00 PM – 8:00 PM",
-    badge: "🎃 Upcoming Show",
+    badge: "Upcoming Show",
     details: [
-        { icon: "🎃", text: "Trunk or Treat: 5:00 PM – 7:00 PM" }
+        { text: "Trunk or Treat: 5:00 PM – 7:00 PM" }
     ],
 
     location:
@@ -4408,13 +4938,13 @@ const additionalUpcomingShows = [
         time: "1:00 PM – 5:00 PM",
         start: "2026-11-28T13:00:00-05:00",
         end: "2026-11-28T17:00:00-05:00",
-        badge: "🎄 Christmas Show",
+        badge: "Christmas Show",
         details: [
-            { icon: "🏆", text: "60+ trophies to be awarded" },
-            { icon: "🎁", text: "Bring a new, unwrapped toy for the Winder Fire Department toy round up" },
-            { icon: "🎅", text: "Santa, the Grinch and Buddy the Elf will appear; photos with Santa and ceramic gingerbread house and snowflake ornaments for kids to paint and take home" },
-            { icon: "🌶️", text: "Chili cook-off · Cassie’s Pit Stop will serve burgers, cheeseburgers, hotdogs, corn dogs, fries, cold drinks, hot chocolate and coffee" },
-            { icon: "💵", text: "Chili cook-off registration: $20 and a new, unwrapped toy" }
+            { text: "60+ trophies to be awarded" },
+            { text: "Bring a new, unwrapped toy for the Winder Fire Department toy round up" },
+            { text: "Santa, the Grinch and Buddy the Elf will appear; photos with Santa and ceramic gingerbread house and snowflake ornaments for kids to paint and take home" },
+            { text: "Chili cook-off · Cassie’s Pit Stop will serve burgers, cheeseburgers, hotdogs, corn dogs, fries, cold drinks, hot chocolate and coffee" },
+            { text: "Chili cook-off registration: $20 and a new, unwrapped toy" }
         ]
     },
     {
@@ -4434,13 +4964,13 @@ const additionalUpcomingShows = [
         time: "11:00 AM – 3:00 PM",
         start: "2026-12-19T11:00:00-05:00",
         end: "2026-12-19T15:00:00-05:00",
-        badge: "💚 Family Benefit Show",
+        badge: "Family Benefit Show",
         details: [
-            { icon: "💚", text: "Benefit for the Watkins family and Martin’s treatment" },
-            { icon: "👕", text: "Please wear green, Martin’s favorite color" },
-            { icon: "🏆", text: "Trophies will be awarded; anything with wheels is welcome" },
-            { icon: "🎁", text: "$20 registration plus a new, unwrapped wheel-related toy or item" },
-            { icon: "🍔", text: "Cassie’s Pit Stop will have food and cold drinks" }
+            { text: "Benefit for the Watkins family and Martin’s treatment" },
+            { text: "Please wear green, Martin’s favorite color" },
+            { text: "Trophies will be awarded; anything with wheels is welcome" },
+            { text: "$20 registration plus a new, unwrapped wheel-related toy or item" },
+            { text: "Cassie’s Pit Stop will have food and cold drinks" }
         ]
     }
 ];
@@ -4500,7 +5030,7 @@ function renderPastShowCard(show) {
         <article class="event-preview past archived-event" data-show-id="${show.id}" onclick="openShowById('${show.id}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openShowById('${show.id}')}">
             <img src="${show.flyer}" alt="${show.name} ${show.subtitle} flyer" loading="lazy">
             <div>
-                <div class="event-preview-tag">🏁 Past show · ${date}</div>
+                <div class="event-preview-tag">Past show · ${date}</div>
                 <h2>${show.name} — ${show.subtitle}</h2>
                 <p>${show.time}<br>${show.location}<br>${show.summary || show.note}</p>
             </div>
@@ -4514,7 +5044,7 @@ function renderUpcomingShowCard(show) {
         <article class="event-preview" data-show-id="${show.id}" onclick="openShowById('${show.id}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openShowById('${show.id}')}">
             <img src="${show.flyer}" alt="${show.shortName} flyer" loading="lazy">
             <div>
-                <div class="event-preview-tag">${show.badge || "📅 Upcoming Show"} · ${date}</div>
+                <div class="event-preview-tag">${show.badge || "Upcoming Show"} · ${date}</div>
                 <h2>${show.shortName}</h2>
                 <p>${show.subtitle || show.name}<br>${show.time}<br>${show.location}<br>${show.summary || ""}</p>
             </div>
@@ -4590,18 +5120,18 @@ function renderEventDetail(show) {
     supplementaryImage.alt = show.supplementaryPhoto
         ? (show.supplementaryAlt || `${show.shortName || show.name} supporting image`)
         : "";
-    document.getElementById("eventTag").textContent = isEnded ? "🏁 Past Show" : (show.badge || "📅 Upcoming Show");
+    document.getElementById("eventTag").textContent = isEnded ? "Past Show" : (show.badge || "Upcoming Show");
     document.getElementById("eventName").textContent = show.name;
     document.getElementById("eventLocation").innerHTML = `${date}<br>${time}<br>${location}`;
     const details = [
-        { icon: "📅", text: date },
-        { icon: "🕓", text: time },
+        { text: date },
+        { text: time },
         ...(show.details || []),
-        { icon: "📍", text: location }
+        { text: location }
     ];
-    if (show.note) details.splice(details.length - 1, 0, { icon: "ℹ️", text: show.note });
+    if (show.note) details.splice(details.length - 1, 0, { text: show.note });
     document.getElementById("eventDetails").innerHTML = details
-        .map(item => `<div class="detail">${item.icon} <b>${item.text}</b></div>`)
+        .map(item => `<div class="detail"><b>${item.text}</b></div>`)
         .join("");
     document.getElementById("countdownArea").style.display = "block";
     document.getElementById("countdownLabel").textContent = isEnded
@@ -4610,7 +5140,7 @@ function renderEventDetail(show) {
     if (isEnded) zeroCountdownDigits();
     const status = document.getElementById("eventStatus");
     status.style.display = isActive || isEnded ? "block" : "none";
-    status.textContent = isEnded ? "🏁 Show Ended" : (isActive ? "🎉 The show is happening now!" : "");
+    status.textContent = isEnded ? "Show Ended" : (isActive ? "The show is happening now!" : "");
     document.querySelector(".photos-link span:last-child").textContent = `Open ${show.shortName || show.name}’s photo gallery →`;
     renderConfiguredPhotos();
 }
@@ -6498,15 +7028,15 @@ function getWeatherCategory(code, rainAmount = 0, snowfall = 0) {
 
 function weatherDescription(category) {
     const labels = {
-        clear: ["☀️", "Clear"],
-        "partly-cloudy": ["🌤️", "Partly cloudy"],
-        overcast: ["☁️", "Cloudy"],
-        rain: ["🌧️", "Rain"],
-        "heavy-rain": ["🌧️", "Heavy rain"],
-        thunderstorm: ["⛈️", "Thunderstorm"],
-        snow: ["❄️", "Snow"],
-        fog: ["🌫️", "Fog"],
-        unknown: ["", "Weather unavailable"]
+        clear: ["Clear", "Clear"],
+        "partly-cloudy": ["Partly cloudy", "Clouds"],
+        overcast: ["Cloudy", "Cloudy"],
+        rain: ["Rain", "Rain"],
+        "heavy-rain": ["Heavy rain", "Rain"],
+        thunderstorm: ["Thunderstorm", "Storm"],
+        snow: ["Snow", "Snow"],
+        fog: ["Fog", "Fog"],
+        unknown: ["Weather unavailable", "Unavailable"]
     };
     return labels[category] || labels.unknown;
 }
@@ -6571,13 +7101,13 @@ function isWeatherObservationFresh(now = Date.now()) {
 
 function renderWeatherIndicator() {
     const category = environmentState.weather;
-    const [icon, label] = weatherDescription(category);
+    const [label, compactLabel] = weatherDescription(category);
     const temperature = environmentState.temperatureF;
     document.getElementById("weatherTemperature").textContent = Number.isFinite(temperature)
         ? `${Math.round(temperature)}°F`
         : "";
-    document.querySelector(".weather-summary-full").textContent = `${icon ? `${icon} ` : ""}${label}`;
-    document.querySelector(".weather-summary-short").textContent = icon;
+    document.querySelector(".weather-summary-full").textContent = label;
+    document.querySelector(".weather-summary-short").textContent = compactLabel;
     document.getElementById("weatherIndicator").setAttribute("aria-label", `Winder, Georgia weather: ${label}${Number.isFinite(temperature) ? `, ${Math.round(temperature)} degrees Fahrenheit` : ""}`);
 }
 
@@ -6670,6 +7200,7 @@ function syncEnvironmentDevControls() {
     const season = document.getElementById("devSeason");
     if (!season) return;
     season.value = environmentOverrides.season;
+    document.getElementById("homeThemeTest").value = environmentOverrides.season;
     document.getElementById("devTime").value = environmentOverrides.timeOfDay;
     document.getElementById("devWeather").value = environmentOverrides.weather;
 
@@ -6833,6 +7364,10 @@ function initializeEnvironmentSystem() {
     if (!cached || cached.age >= 10 * 60 * 1000) void fetchWinderWeather();
     startWeatherPolling();
     startEnvironmentStateRefresh();
+    document.getElementById("homeThemeTest").addEventListener("change", event => {
+        environmentOverrides.season = event.currentTarget.value;
+        applyEnvironmentState();
+    });
     initializeEnvironmentDevTools();
 }
 
@@ -7231,7 +7766,7 @@ function updateCountdown() {
         countdown.style.display = "none";
         countdownLabel.textContent = "Show is happening now";
         status.style.display = "block";
-        status.textContent = "🎉 The show is happening now!";
+        status.textContent = "The show is happening now!";
         return;
     }
 
@@ -7239,7 +7774,7 @@ function updateCountdown() {
     countdownLabel.textContent = "Show ended";
     zeroCountdownDigits();
     status.style.display = "block";
-    status.textContent = "🏁 Show Ended";
+    status.textContent = "Show Ended";
 
 }
 
