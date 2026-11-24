@@ -219,33 +219,6 @@ nav button.active {
     max-width: 850px;
 }
 
-.season-test-control {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin: 18px auto 0;
-    color: var(--muted);
-    font-size: .82rem;
-}
-
-.season-test-control select {
-    min-height: 38px;
-    max-width: 220px;
-    padding: 7px 34px 7px 11px;
-    border: 1px solid var(--border-accent);
-    border-radius: 10px;
-    color: var(--text);
-    background: color-mix(in srgb, var(--panel-solid, #111417) 92%, transparent);
-    font: inherit;
-    cursor: pointer;
-}
-
-@media (max-width: 520px) {
-    .season-test-control { flex-direction: column; gap: 6px; }
-    .season-test-control select { width: min(100%, 250px); }
-}
-
 .eyebrow {
     color: var(--orange2);
 
@@ -4250,25 +4223,6 @@ body.martin-strong-theme .gift-drop-layer {
                 </a>
             </div>
 
-            <div class="season-test-control">
-                <label for="homeThemeTest">Test seasonal theme</label>
-                <select id="homeThemeTest" aria-label="Choose a seasonal theme to preview">
-                    <option value="auto">Automatic season</option>
-                    <option value="default">Georgia Red</option>
-                    <option value="winter">Winter</option>
-                    <option value="valentine">Valentine</option>
-                    <option value="spring">Early Spring</option>
-                    <option value="showers">Spring Showers</option>
-                    <option value="late-spring">Late Spring</option>
-                    <option value="summer">Summer</option>
-                    <option value="independence">Independence Day</option>
-                    <option value="fall">Fall</option>
-                    <option value="halloween">Halloween</option>
-                    <option value="thanksgiving">Thanksgiving</option>
-                    <option value="christmas">Christmas</option>
-                </select>
-            </div>
-
         </div>
 
     </div>
@@ -7200,7 +7154,6 @@ function syncEnvironmentDevControls() {
     const season = document.getElementById("devSeason");
     if (!season) return;
     season.value = environmentOverrides.season;
-    document.getElementById("homeThemeTest").value = environmentOverrides.season;
     document.getElementById("devTime").value = environmentOverrides.timeOfDay;
     document.getElementById("devWeather").value = environmentOverrides.weather;
 
@@ -7364,10 +7317,6 @@ function initializeEnvironmentSystem() {
     if (!cached || cached.age >= 10 * 60 * 1000) void fetchWinderWeather();
     startWeatherPolling();
     startEnvironmentStateRefresh();
-    document.getElementById("homeThemeTest").addEventListener("change", event => {
-        environmentOverrides.season = event.currentTarget.value;
-        applyEnvironmentState();
-    });
     initializeEnvironmentDevTools();
 }
 
